@@ -1,15 +1,32 @@
-# OpenGL Warmup Project
-This project is a simple OpenGL 3D model renderer. It allows .obj and .mtl files to be opened and viewed. The core libraries used are GLEW, GLFW, and GLM.
+# OpenGL Modeler Project
+This project is a simple OpenGL 3D modeling engine. 
+It allows .obj and .mtl files to be opened, viewed, modified, and written back into files. 
+The core libraries used are GLEW, GLFW, and GLM.
 
 ## Compilation
-The project uses CMake to build. Running the CMake GUI application and selecting the project's root directory, ie. `<location>/OpenGLWarmup/` as the source code location, and `<location>/OpenGLWarmup/build` as the build location, and then running `configure` and `generate` allows the user to create visual studio project files for the project. After these files are generated, the program can be opened in visual studio by opening the `OpenGLWarmup.sln` project file. To build the program in visual studio, right click the 'OpenGLWarmup' project inside the solution hierarchy in visual studio and select `Set as startup project`. Finally, right click the 'OpenGLWarmup' project, select properties, and in the 'Configuration Properties >> Linker >> Input' section, add `glew32s.lib` to the 'Additional Dependencies' field. Now the project can be recompiled by pressing F7 or selecting 'Build >> Build Solution' in Visual Studio.
+The project uses CMake to build. 
+Running the CMake GUI application and selecting the project's root directory, ie. `<location>/OpenModeler/` 
+as the source code location, and `<location>/OpenModeler/build` as the build location, 
+and then running `configure` and `generate` allows the user to create visual studio project files for the project. 
+After these files are generated, the program can be opened in visual studio by opening the `OpenModeler.sln` project file. 
+To build the program in visual studio, right click the 'OpenModeler' project inside the 
+solution hierarchy in Visual Studio and select `Set as startup project`. 
+Finally, right click the 'OpenModeler' project, select properties, 
+and in the 'Configuration Properties >> Linker >> Input' section, add `glew32s.lib` to the 'Additional Dependencies' field. 
+Now the project can be recompiled by pressing F7 or selecting 'Build >> Build Solution' in Visual Studio.
 
 ## Running
-The program can be launched on Windows by opening the OpenGLWarmup.exe file in the `/bin/` folder. If the program was recompiled in visual studio, make sure that the executable file is in the `<location>/OpenGLWarmup/bin/` folder. If this folder does not exist, create the folder and move the executable to that folder. The project structure requires that `config.txt` is in the root folder `/`, `OpenGLWarmup.exe` is in the `/bin/` folder, 3D models to be loaded are in the `/models/` folder, and vertex and fragment shader source codes are in the `/src/` folder. If the program does not run, ensure that the program files follow this exact structure.
+The program can be launched on Windows by opening the OpenModeler.exe file in the `/bin/` folder. 
+If the program was recompiled in visual studio, make sure that the executable file is in the `<location>/OpenModeler/bin/` folder. 
+If this folder does not exist, create the folder and move the executable to that folder. 
+The project structure requires that `config.txt` is in the root folder `/`, `OpenModeler.exe` is in the `/bin/` folder, 
+3D models to be loaded are in the `/models/` folder, and vertex and fragment shader source codes are in the `/shaders/` folder. 
+If the program does not run, ensure that the program files follow this exact structure.
 The program can also be run by opening the visual studio project and launching the application in either Debug or Release mode.
 
 ## Operation
-In `/config.txt`, choose which model to load and options on how to load it. The project comes with several 3D models, but new ones can be placed in the `/models/` folder and selected in `/config.txt` to be loaded.
+In `/config.txt`, choose which model to load and options on how to load it. 
+The project comes with several 3D models, but new ones can be placed in the `/models/` folder and selected in `/config.txt` to be loaded.
 
 ### Options usage:
 Which object should be loaded by the program. Should be a '.obj' file
@@ -47,34 +64,59 @@ Should the camera be in perspective? [1] Yes, [0] No
 
 ### Program usage:
 Press `[W]` to move mesh forward
+
 Press `[S]` to move mesh back
+
 Press `[D]` to move mesh right
+
 Press `[A]` to move mesh left
+
 Press `[Space]` to move mesh up
+
 Press `[Shift]` to move mesh down
 
+
 Press `[Ctrl + W]` to move camera forward
+
 Press `[Ctrl + S]` to move camera back
+
 Press `[Ctrl + D]` to move camera right
+
 Press `[Ctrl + A]` to move camera left
+
 Press `[Ctrl + Space]` to move camera up
+
 Press `[Ctrl + Shift]` to move camera down
 
+
 Press `[Q]` to scale mesh up
+
 Press `[E]` to scale mesh down
+
 Press `[Up Arrow]` to rotate mesh up
+
 Press `[Down Arrow]` to rotate mesh down
+
 Press `[Right Arrow]` to rotate mesh right
+
 Press `[Left Arrow]` to rotate mesh left
 
+
 Press `[Ctrl + Up Arrow]` to rotate camera up
+
 Press `[Ctrl + Down Arrow]` to rotate camera down
+
 Press `[Ctrl + Right Arrow]` to rotate camera right
+
 Press `[Ctrl + Left Arrow]` to rotate camera left
+
 Press `[F]` to focus camera on the mesh
 
+
 Press `[Alt + Left Mouse Button]` to rotate camera with the mouse
+
 Press `[Alt + Right Mouse Button]` to move camera with the mouse
+
 Press `[Esc]` to exit the program
 
 ### Links to libraries:
