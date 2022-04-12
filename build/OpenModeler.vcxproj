@@ -365,8 +365,40 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\camera.h" />
+    <ClInclude Include="..\src\fileHelper.h" />
+    <ClInclude Include="..\src\indexStructs.h" />
+    <ClInclude Include="..\src\input.h" />
+    <ClInclude Include="..\src\light.h" />
+    <ClInclude Include="..\src\loadShader.h" />
+    <ClInclude Include="..\src\material.h" />
+    <ClInclude Include="..\src\mesh.h" />
+    <ClInclude Include="..\src\meshModel.h" />
+    <ClInclude Include="..\src\objReader.h" />
+    <ClInclude Include="..\src\objWriter.h" />
+    <ClInclude Include="..\src\openHelper.h" />
+    <ClInclude Include="..\src\options.h" />
+    <ClInclude Include="..\src\pngWriter.h" />
+    <ClInclude Include="..\src\triangle.h" />
+    <ClInclude Include="..\src\vertex.h" />
     <ClInclude Include="C:\Users\manu2\source\repos\OpenModeler\src\glIncludes.h" />
     <ClInclude Include="C:\Users\manu2\source\repos\OpenModeler\src\openModeler.h" />
+    <ClCompile Include="..\src\camera.cpp" />
+    <ClCompile Include="..\src\fileHelper.cpp" />
+    <ClCompile Include="..\src\indexStructs.cpp" />
+    <ClCompile Include="..\src\input.cpp" />
+    <ClCompile Include="..\src\light.cpp" />
+    <ClCompile Include="..\src\loadShader.cpp" />
+    <ClCompile Include="..\src\material.cpp" />
+    <ClCompile Include="..\src\mesh.cpp" />
+    <ClCompile Include="..\src\meshModel.cpp" />
+    <ClCompile Include="..\src\objReader.cpp" />
+    <ClCompile Include="..\src\objWriter.cpp" />
+    <ClCompile Include="..\src\openHelper.cpp" />
+    <ClCompile Include="..\src\options.cpp" />
+    <ClCompile Include="..\src\pngWriter.cpp" />
+    <ClCompile Include="..\src\triangle.cpp" />
+    <ClCompile Include="..\src\vertex.cpp" />
     <ClCompile Include="C:\Users\manu2\source\repos\OpenModeler\src\openModeler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -382,6 +414,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />
+    <None Include="..\shaders\gouraudShader.frag" />
+    <None Include="..\shaders\gouraudShader.vertex" />
+    <None Include="..\shaders\phongShader.frag" />
+    <None Include="..\shaders\phongShader.vertex" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

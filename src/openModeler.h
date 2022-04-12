@@ -1,7 +1,12 @@
 ﻿#pragma once
-#include "glIncludes.h"
-#include <iostream>
-#include <string>
-
-void processInput(GLFWwindow *window);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+#include "openHelper.h"
+#include "options.h"
+#include "loadShader.h"
+#include "fileHelper.h"
+#include "light.h"
+#include "camera.h"
+#include "input.h"
+#include "meshModel.h"
+#include "objReader.h"
+#include "objWriter.h"
+#include "pngWriter.h"

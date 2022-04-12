@@ -1,22 +1,5 @@
 ﻿#include "openModeler.h"
 
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
-
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
-
 int main()
 {
     // glfw: initialize and configure
@@ -32,7 +15,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "viewGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Kolehmainen OpenGL Viewer", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -40,107 +23,232 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     // // glew: load all OpenGL function pointers
     glewInit();
 
+    // Read Options
+    // ------------
+    Options options = ReadOptions("../config.txt");
+# define INDEXED options.vertexModel == 1
+# define IS_PHONG options.phong == 1
 
     // build and compile our shader program
     // ------------------------------------
-    // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    unsigned int shaderProgram;
+    // Load phong shader
+    if (IS_PHONG)
+        shaderProgram = LoadShaders("../shaders/phongShader.vertex", "../shaders/phongShader.frag");
+    // Load gouraud shader
+    else
+        shaderProgram = LoadShaders("../shaders/gouraudShader.vertex", "../shaders/gouraudShader.frag");
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float vertices[] = {
-        -0.5f, -.25f, 0.0f, // left  
-         0.5f, -.75f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f, // top   
+    // Create camera
+    Camera camera = Camera(
+        options.camFov, options.camNearClip, options.camFarClip,
+        options.camPos, options.camLookAt, options.camUp,
+        options.camSize, options.isPerspective);
 
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f, -1.0f, 0.0f  // bottom
-    };
-    unsigned int numVertices = sizeof(vertices)/3;
+    // Create light
+    Light dirLight = Light(
+        glm::vec3(5.0f, 5.0f, 5.0f),        // Light pos
+        glm::vec3(-1.0f, -1.0f, -1.0f),     // Light dir
+        glm::vec3(1.0f, 1.0f, 1.0f),        // Light color
+        0.1f,                               // Ambient strength
+        0.5f);                              // Specular strength
 
-    unsigned int VBO, VAO;
+    // Read mesh
+    // ---------
+    IMesh* imesh;
+    SMesh* smesh;
+    Mesh* displayMesh;
+
+    // Cast the mesh
+    if (INDEXED) {
+        imesh = new IMesh();
+        displayMesh = imesh;
+    }
+    else {
+        smesh = new SMesh();
+        displayMesh = smesh;
+    }
+
+    // Set default color
+    displayMesh->defaultMat = options.defaultColor;
+
+    // Read mesh from file
+    ReadObjFromFile(displayMesh, "../models/", options.objName);
+    displayMesh->Scale(glm::vec3(options.objScale, options.objScale, options.objScale));
+    displayMesh->SetPos(options.objPos);
+
+    // Load up model into vertice and indice structures
+    int vertsSize;
+    float* vertices;
+    int indicesSize;
+    unsigned int* indices;
+    unsigned int numVertices;
+
+    // Indexed triangle structure
+    if (INDEXED) {
+        // Get vertices
+        vertsSize = imesh->GetVertCount() * 2;
+        vertices = new float[vertsSize];
+        imesh->ConvertToVertData(vertices);
+
+        // Get indices
+        indicesSize = imesh->GetIndexCount();
+        indices = new unsigned int[indicesSize];
+        imesh->ConvertToIndexData(indices);
+
+        numVertices = imesh->GetVertCount();
+    }
+    // Separate triangle structure
+    else {
+        // Get vertices
+        vertsSize = smesh->GetVertCount() * 9;
+        vertices = new float[vertsSize];
+        smesh->ConvertToVertColorNormalData(vertices);
+
+        numVertices = smesh->GetVertCount();
+    }
+
+    // Print vertices and indices
+    if (options.print == 1) {
+        PrintArray("Printing vertices:", vertices, vertsSize, 9);
+        if (INDEXED)
+            PrintArray("Printing indices:", indices, indicesSize, 9);
+    }
+
+    // Init VAO, VBO, and EBO
+    unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertsSize * sizeof(vertices[0]), vertices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    // Only use EBO for indexed vertex model
+    if (INDEXED) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(indices[0]), indices, GL_STATIC_DRAW);
+    }
+
+    // Position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // Normal
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // Color
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glBindVertexArray(0);
+
+    // Generate light
+    //unsigned int lightVAO;
+    //glGenVertexArrays(1, &lightVAO);
+    //glBindVertexArray(lightVAO);
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
+
+    // Get uniform locations
+    unsigned int matrixID = glGetUniformLocation(shaderProgram, "MVP");
+    unsigned int modelID = glGetUniformLocation(shaderProgram, "Model");
+    unsigned int normalModelID = glGetUniformLocation(shaderProgram, "NormalModel");
+    unsigned int lightPosID = glGetUniformLocation(shaderProgram, "LightPos");
+    unsigned int lightColorID = glGetUniformLocation(shaderProgram, "LightColor");
+    unsigned int viewPosID = glGetUniformLocation(shaderProgram, "ViewPos");
+    unsigned int ambientStrengthID = glGetUniformLocation(shaderProgram, "AmbientStrength");
+    unsigned int specularStrengthID = glGetUniformLocation(shaderProgram, "SpecularStrength");
+
+    // Get initial mvp
+    glm::mat4 mvp = CalcMVP(&camera, displayMesh);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
+    // Enable culling
+    glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    //glFrontFace(GL_CCW);
 
+    // Enable depth buffer
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
-    // uncomment this call to draw in wireframe polygons.
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // Enable wireframe if requested in options
+    if (options.wireframe == 1) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+
+    // Init variables to track user input. Speed constants declared in order:
+    // CamMove, CamTurn, ModelMove, ModelTurn, ModelScale, MouseMove, MouseTurn
+    SpeedConsts speeds = SpeedConsts(2.0f, 1.0f, 0.3f, 30.0f, 1.0f, 0.1f, 0.1f);
+    int prevX = -1;
+    int prevY = -1;
+
+    // Track time
+    double lastTime = glfwGetTime();
+    double currentTime = glfwGetTime();
+    float deltaTime = 0.0f;
 
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        // Get deltaTime
+        lastTime = currentTime;
+        currentTime = glfwGetTime();
+        deltaTime = float(currentTime - lastTime);
+
         // input
         // -----
-        processInput(window);
+        ProcessInput(window, &camera, displayMesh, deltaTime, &speeds, &prevX, &prevY);
 
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.90f, 0.90f, 0.90f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // draw our first triangle
+        // Draw the object
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        glDrawArrays(GL_TRIANGLES, 0, numVertices);
+
+        // Apply MVP
+        glm::mat4 model = GetModelMatrix(displayMesh);
+        glm::mat4 view = GetViewMatrix(&camera);
+        glm::mat4 projection = GetProjectionMatrix(&camera);
+        glm::mat3 normalModel = glm::mat3(glm::transpose(glm::inverse(model)));
+        mvp = projection * view * model;
+        glUniformMatrix4fv(matrixID, 1, GL_FALSE, &mvp[0][0]);
+        glUniformMatrix4fv(modelID, 1, GL_FALSE, &model[0][0]);
+        glUniformMatrix3fv(normalModelID, 1, GL_FALSE, &normalModel[0][0]);
+
+        // Apply lighting
+        glUniform1f(ambientStrengthID, dirLight.ka);
+        glUniform1f(specularStrengthID, dirLight.ks);
+        glUniform3fv(lightPosID, 1, &dirLight.pos[0]);
+        glUniform3fv(lightColorID, 1, &dirLight.color[0]);
+        glUniform3fv(viewPosID, 1, &camera.pos[0]);
+        glBindVertexArray(VAO);
+
+        // Draw indexed EBO
+        if (INDEXED) {
+            glDrawElements(GL_TRIANGLES, indicesSize, GL_UNSIGNED_INT, 0);
+            //glBindVertexArray(0);
+        }
+        // Draw separate VAO
+        else {
+            glDrawArrays(GL_TRIANGLES, 0, numVertices);
+        }
+
+
         // glBindVertexArray(0); // unbind our VA no need to unbind it every time 
- 
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -153,25 +261,19 @@ int main()
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
 
+    // Clear up dynamic memory usage
+    // -----------------------------
+    delete[] vertices;
+    delete displayMesh;
+
+    // Only delete what was initialized
+    if (INDEXED) {
+        glDeleteBuffers(1, &EBO);
+        delete[] indices;
+    }
+
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
-}
-
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-// glfw: whenever the window size changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
 }
