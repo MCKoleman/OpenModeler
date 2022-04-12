@@ -35,3 +35,7 @@ Camera::Camera(float _fov, float _nearClip, float _farClip, glm::vec3 _pos, glm:
     rotation = glm::vec3(PI, 0.0f, 0.0f);
     CalcBasis();
 }
+
+Camera::Camera(Options* options)
+    : Camera(options->camFov, options->camNearClip, options->camFarClip, options->camPos, options->camLookAt, options->camUp, options->camSize, options->isPerspective)
+{}

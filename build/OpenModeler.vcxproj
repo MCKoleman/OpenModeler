@@ -371,6 +371,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\src\input.h" />
     <ClInclude Include="..\src\light.h" />
     <ClInclude Include="..\src\loadShader.h" />
+    <ClInclude Include="..\src\lodepng.h" />
     <ClInclude Include="..\src\material.h" />
     <ClInclude Include="..\src\mesh.h" />
     <ClInclude Include="..\src\meshModel.h" />
@@ -389,6 +390,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\src\input.cpp" />
     <ClCompile Include="..\src\light.cpp" />
     <ClCompile Include="..\src\loadShader.cpp" />
+    <ClCompile Include="..\src\lodepng.cpp" />
     <ClCompile Include="..\src\material.cpp" />
     <ClCompile Include="..\src\mesh.cpp" />
     <ClCompile Include="..\src\meshModel.cpp" />
@@ -413,6 +415,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <Text Include="..\config.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.gitignore" />
     <None Include="..\README.md" />
     <None Include="..\shaders\gouraudShader.frag" />
     <None Include="..\shaders\gouraudShader.vertex" />

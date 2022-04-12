@@ -1,5 +1,37 @@
 #include "openHelper.h"
 
+GLFWwindow* OpenGLInitWindow(int width, int height, std::string name)
+{
+    // glfw: initialize and configure
+    // ------------------------------
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+    const char* windowName = name.c_str();
+
+    // glfw window creation
+    // --------------------
+    GLFWwindow* window = glfwCreateWindow(width, height, windowName, NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return nullptr;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+
+    // // glew: load all OpenGL function pointers
+    glewInit();
+    return window;
+}
+
 // Calculates the model view perspective matrix
 // --------------------------------------------
 glm::mat4 CalcMVP(Camera* camera, Mesh* mesh)

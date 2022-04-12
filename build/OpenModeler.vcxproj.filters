@@ -52,6 +52,9 @@
     <ClCompile Include="..\src\openHelper.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\lodepng.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\manu2\source\repos\OpenModeler\src\glIncludes.h">
@@ -108,6 +111,9 @@
     <ClInclude Include="..\src\openHelper.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\lodepng.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\manu2\source\repos\OpenModeler\CMakeLists.txt" />
@@ -142,6 +148,9 @@
       <Filter>Resources</Filter>
     </None>
     <None Include="..\shaders\phongShader.vertex">
+      <Filter>Resources</Filter>
+    </None>
+    <None Include="..\.gitignore">
       <Filter>Resources</Filter>
     </None>
   </ItemGroup>

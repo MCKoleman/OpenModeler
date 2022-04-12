@@ -2,31 +2,10 @@
 
 int main()
 {
-    // glfw: initialize and configure
-    // ------------------------------
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-    // glfw window creation
-    // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Kolehmainen OpenGL Viewer", NULL, NULL);
-    if (window == NULL)
-    {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
+    // Init window
+    GLFWwindow* window = OpenGLInitWindow(SCR_WIDTH, SCR_HEIGHT, "OpenModeler");
+    if (window == nullptr)
         return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-
-    // // glew: load all OpenGL function pointers
-    glewInit();
 
     // Read Options
     // ------------
@@ -44,11 +23,8 @@ int main()
     else
         shaderProgram = LoadShaders("../shaders/gouraudShader.vertex", "../shaders/gouraudShader.frag");
 
-    // Create camera
-    Camera camera = Camera(
-        options.camFov, options.camNearClip, options.camFarClip,
-        options.camPos, options.camLookAt, options.camUp,
-        options.camSize, options.isPerspective);
+    // Create camera from options
+    Camera camera = Camera(&options);
 
     // Create light
     Light dirLight = Light(

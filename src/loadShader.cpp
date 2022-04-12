@@ -41,8 +41,7 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
 
     // Load vertex shader from source.vs
     std::string tempVertShader = ReadShaderFromFile(vertexFile);
-    char* vertexShaderFile = new char[tempVertShader.size() + 1];
-    strcpy(vertexShaderFile, tempVertShader.c_str());
+    const char* vertexShaderFile = tempVertShader.c_str();
 
     glShaderSource(vertexShader, 1, &vertexShaderFile, NULL);
     glCompileShader(vertexShader);
@@ -66,8 +65,7 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
 
     // Load fragment shader from source.fs
     std::string tempFragShader = ReadShaderFromFile(fragmentFile);
-    char* fragmentShaderFile = new char[tempFragShader.size() + 1];
-    strcpy(fragmentShaderFile, tempFragShader.c_str());
+    const char* fragmentShaderFile = tempFragShader.c_str();
 
     glShaderSource(fragmentShader, 1, &fragmentShaderFile, NULL);
     glCompileShader(fragmentShader);
@@ -100,10 +98,6 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
     glDeleteShader(fragmentShader);
     // ----------------------
     // End of linking shaders
-
-    // Clear up used memory
-    delete[] vertexShaderFile;
-    delete[] fragmentShaderFile;
 
     return shaderProgram;
 }
