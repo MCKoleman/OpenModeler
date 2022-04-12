@@ -54,7 +54,7 @@ void PrintArray(std::string startText, float arr[], int n, int elemsPerLine)
     for (int i = 0; i < n; i++) {
         // Print index on first line
         if (i % elemsPerLine == 0)
-            cout << "[" << (int)(i / 6) << "] ";
+            cout << "[" << (int)(i / elemsPerLine) << "] ";
 
         // Print element
         cout << "(" << arr[i] << ")";
@@ -82,7 +82,7 @@ void PrintArray(std::string startText, unsigned int arr[], int n, int elemsPerLi
     for (int i = 0; i < n; i++) {
         // Print index on first line
         if (i % elemsPerLine == 0)
-            cout << "[" << (int)(i / 6) << "] ";
+            cout << "[" << (int)(i / elemsPerLine) << "] ";
 
         // Print element
         cout << "(" << arr[i] << ")";

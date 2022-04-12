@@ -36,21 +36,7 @@ int main()
 
     // Read mesh
     // ---------
-    IMesh* imesh;
-    SMesh* smesh;
-    Mesh* displayMesh;
-
-    // Cast the mesh
-    if (INDEXED) {
-        imesh = new IMesh();
-        displayMesh = imesh;
-    }
-    else {
-        smesh = new SMesh();
-        displayMesh = smesh;
-    }
-
-    // Set default color
+    Mesh* displayMesh = new Mesh();
     displayMesh->defaultMat = options.defaultColor;
 
     // Read mesh from file
@@ -59,59 +45,41 @@ int main()
     displayMesh->SetPos(options.objPos);
 
     // Load up model into vertice and indice structures
-    int vertsSize;
-    float* vertices;
-    int indicesSize;
-    unsigned int* indices;
-    unsigned int numVertices;
+    // Get vertices
+    int vertsSize = displayMesh->GetVertCount() * 9;
+    float* vertices = new float[vertsSize];
+    displayMesh->ConvertToVertData(vertices);
 
-    // Indexed triangle structure
-    if (INDEXED) {
-        // Get vertices
-        vertsSize = imesh->GetVertCount() * 2;
-        vertices = new float[vertsSize];
-        imesh->ConvertToVertData(vertices);
+    // Get indices
+    int indicesSize = displayMesh->GetIndexCount();
+    unsigned int* indices = new unsigned int[indicesSize];
+    displayMesh->ConvertToIndexData(indices);
 
-        // Get indices
-        indicesSize = imesh->GetIndexCount();
-        indices = new unsigned int[indicesSize];
-        imesh->ConvertToIndexData(indices);
-
-        numVertices = imesh->GetVertCount();
-    }
-    // Separate triangle structure
-    else {
-        // Get vertices
-        vertsSize = smesh->GetVertCount() * 9;
-        vertices = new float[vertsSize];
-        smesh->ConvertToVertColorNormalData(vertices);
-
-        numVertices = smesh->GetVertCount();
-    }
+    //unsigned int numVertices = displayMesh->GetVertCount();
 
     // Print vertices and indices
     if (options.print == 1) {
         PrintArray("Printing vertices:", vertices, vertsSize, 9);
         if (INDEXED)
-            PrintArray("Printing indices:", indices, indicesSize, 9);
+            PrintArray("Printing indices:", indices, indicesSize, 3);
     }
 
     // Init VAO, VBO, and EBO
     unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glGenBuffers(1, &VBO);
+
+    // Bind VAO
+    glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
+    // Bind VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertsSize * sizeof(vertices[0]), vertices, GL_STATIC_DRAW);
 
-    // Only use EBO for indexed vertex model
-    if (INDEXED) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(indices[0]), indices, GL_STATIC_DRAW);
-    }
+    // Bind EBO
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(indices[0]), indices, GL_STATIC_DRAW);
 
     // Position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
@@ -150,8 +118,6 @@ int main()
 
     // Enable culling
     glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
 
     // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
@@ -213,17 +179,8 @@ int main()
         glBindVertexArray(VAO);
 
         // Draw indexed EBO
-        if (INDEXED) {
-            glDrawElements(GL_TRIANGLES, indicesSize, GL_UNSIGNED_INT, 0);
-            //glBindVertexArray(0);
-        }
-        // Draw separate VAO
-        else {
-            glDrawArrays(GL_TRIANGLES, 0, numVertices);
-        }
-
-
-        // glBindVertexArray(0); // unbind our VA no need to unbind it every time 
+        glDrawElements(GL_TRIANGLES, indicesSize * sizeof(indices[0]), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -235,18 +192,14 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     glDeleteProgram(shaderProgram);
 
     // Clear up dynamic memory usage
     // -----------------------------
     delete[] vertices;
+    delete[] indices;
     delete displayMesh;
-
-    // Only delete what was initialized
-    if (INDEXED) {
-        glDeleteBuffers(1, &EBO);
-        delete[] indices;
-    }
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

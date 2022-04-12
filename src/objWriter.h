@@ -1,5 +1,5 @@
 #pragma once
-#include "meshModel.h"
+#include "mesh.h"
+#include "fileHelper.h"
 
-void WriteObjToFile(SMesh* mesh, std::string location, std::string fileName);
-void WriteObjToFile(IMesh* mesh, std::string location, std::string fileName);
+void WriteObjToFile(Mesh* mesh, std::string location, std::string fileName);

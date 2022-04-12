@@ -15,8 +15,13 @@ protected:
 	glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 forward = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	// Data
+	std::vector<Triangle> tris;
+	std::unordered_map<int, Vertex> verts;
 public:
 	Material defaultMat = Material();
+	int lastVertIndex = 0;
 
 	// Calculates the basis of the mesh
 	void CalcBasis();
@@ -50,22 +55,36 @@ public:
 	void SetScale(glm::vec3 _scale);
 
 	// Returns the size of the mesh if it was converted into a vertex array (needed for allocating memory for ConvertToVertData())
-	virtual int GetVertCount() = 0;
+	int GetVertCount();
+	// Returns the number of indexes in this mesh
+	int GetIndexCount();
+	// Gets the number of tris in the mesh
+	int GetTriCount();
+
+	// Adds the given triangle to the mesh
+	void AddTri(Triangle _tri);
+	// Adds the given vertex as the latest vertex of this mesh
+	int AddVert(Vertex _vert);
+	// Adds the given vertex to the given index
+	int AddVert(int _index, Vertex _vert);
+	// Sets the triangle at the given index to the given triangle
+	void SetTri(size_t index, Triangle _tri);
+	// Returns the tri at the given index
+	Triangle GetTri(size_t index);
 
 	// Converts this mesh into a vertex array and stores it in the given array
-	virtual void ConvertToVertData(float out[]) = 0;
+	void ConvertToVertData(float out[]);
+	// Converts this mesh into a vertex index array
+	void ConvertToIndexData(unsigned int out[]);
 
 	// Clears the mesh of all tris
-	virtual void ClearTris() = 0;
-
-	// Gets the number of tris in the mesh
-	virtual int GetTriCount() = 0;
+	void ClearTris();
 
 	// Vertex model of the mesh [0 for separate, 1 for indexed]
-	virtual int GetVertexModel() = 0;
+	int GetVertexModel();
 
 	// Recalculates the normals of the mesh
-	virtual void RecalculateNormals() = 0;
+	void RecalculateNormals();
 
 	Mesh();
 	~Mesh();

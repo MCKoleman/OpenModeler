@@ -6,7 +6,6 @@
 #include "light.h"
 #include "camera.h"
 #include "input.h"
-#include "meshModel.h"
 #include "objReader.h"
 #include "objWriter.h"
 #include "pngWriter.h"
