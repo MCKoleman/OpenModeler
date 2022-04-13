@@ -101,3 +101,13 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
 
     return shaderProgram;
 }
+
+unsigned int LoadShaderProgram(bool isPhong)
+{
+    // Load phong shader
+    if (isPhong)
+        return LoadShaders("../shaders/phongShader.vertex", "../shaders/phongShader.frag");
+    // Load gouraud shader
+    else
+        return LoadShaders("../shaders/gouraudShader.vertex", "../shaders/gouraudShader.frag");
+}

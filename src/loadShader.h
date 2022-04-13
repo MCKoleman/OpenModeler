@@ -7,3 +7,4 @@
 
 std::string ReadShaderFromFile(std::string filename);
 unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile);
+unsigned int LoadShaderProgram(bool isPhong);

@@ -1,5 +1,7 @@
 #pragma once
-#include "mesh.h"
+#include "scene.h"
 #include "fileHelper.h"
 
-void WriteObjToFile(Mesh* mesh, std::string location, std::string fileName);
+void WriteObjToFile(Scene* scene, std::string location, std::string fileName);
+void WriteMtlToFile(Material* mat, std::string location, std::string fileName);
+void WriteMtlToFile(MaterialStorage* mats, std::string location, std::string fileName);

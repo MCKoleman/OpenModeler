@@ -18,6 +18,7 @@ struct Camera {
 	bool isPerspective;
 
 	void CalcBasis();
+	void SetFromOptions(Options* options);
 
 	Camera();
 	Camera(float _fov, float _nearClip, float _farClip);

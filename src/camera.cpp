@@ -20,6 +20,21 @@ void Camera::CalcBasis()
     up = glm::cross(right, dir);
 }
 
+void Camera::SetFromOptions(Options* options)
+{
+    fov = options->camFov;
+    nearClip = options->camNearClip;
+    farClip = options->camFarClip;
+    pos = options->camPos;
+    dir = options->camLookAt;
+    up = options->camUp;
+    orthSize = options->camSize;
+    isPerspective = options->isPerspective;
+    rotation = glm::vec3(PI, 0.0f, 0.0f);
+
+    CalcBasis();
+}
+
 Camera::Camera()
     : Camera(-45.0f, 0.1f, 100.0f) {}
 
@@ -36,6 +51,4 @@ Camera::Camera(float _fov, float _nearClip, float _farClip, glm::vec3 _pos, glm:
     CalcBasis();
 }
 
-Camera::Camera(Options* options)
-    : Camera(options->camFov, options->camNearClip, options->camFarClip, options->camPos, options->camLookAt, options->camUp, options->camSize, options->isPerspective)
-{}
+Camera::Camera(Options* options) { SetFromOptions(options); }

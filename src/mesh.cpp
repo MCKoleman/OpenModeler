@@ -80,56 +80,7 @@ void Mesh::SetScale(glm::vec3 _scale)
 }
 
 // Mesh main function definitions
-// -----------------
-void Mesh::ConvertToVertData(float out[])
-{
-	// Track out indices separate from loop
-	size_t outIndex = 0;
-	for (int i = 0; i < lastVertIndex; i++) {
-		glm::vec3 vertPos = verts[i + 1].pos;
-		glm::vec3 vertNorm = verts[i + 1].normal;
-		Material vertMat = defaultMat;
-		glm::vec3 vertColor = vertMat.kd;
-
-		// Position
-		out[outIndex] = vertPos.x + pos.x;
-		outIndex++;
-		out[outIndex] = vertPos.y + pos.y;
-		outIndex++;
-		out[outIndex] = vertPos.z + pos.z;
-		outIndex++;
-
-		// Normal
-		out[outIndex] = vertNorm.x;
-		outIndex++;
-		out[outIndex] = vertNorm.y;
-		outIndex++;
-		out[outIndex] = vertNorm.z;
-		outIndex++;
-
-		// Color
-		out[outIndex] = glm::clamp(vertColor.x + vertMat.ka.x, 0.0f, 1.0f);
-		outIndex++;
-		out[outIndex] = glm::clamp(vertColor.y + vertMat.ka.y, 0.0f, 1.0f);
-		outIndex++;
-		out[outIndex] = glm::clamp(vertColor.z + vertMat.ka.z, 0.0f, 1.0f);
-		outIndex++;
-	}
-}
-
-void Mesh::ConvertToIndexData(unsigned int out[])
-{
-	// Track out indices separate from loop
-	size_t outIndex = 0;
-	for (int i = 0; i < tris.size(); i++) {
-		for (int j = 0; j < TRI_VERTS; j++) {
-			// TEMP FIX, MOVE THIS TO READING
-			out[outIndex] = tris[i].vertices[j] - 1;
-			outIndex++;
-		}
-	}
-}
-
+// ------------------------------
 void Mesh::AddTri(Triangle _tri)
 {
 	tris.push_back(_tri);
@@ -164,6 +115,7 @@ void Mesh::ClearTris()
 {
 	tris.clear();
 	verts.clear();
+	lastVertIndex = -1;
 }
 
 int Mesh::GetVertCount()
@@ -182,13 +134,25 @@ int Mesh::GetTriCount()
 	return (int)tris.size();
 }
 
+std::vector<Triangle>& Mesh::GetTris()
+{
+	return tris;
+}
+
+std::unordered_map<int, Vertex>& Mesh::GetVerts()
+{
+	return verts;
+}
+
+std::string Mesh::GetName() { return name; }
+void Mesh::SetName(std::string _name) { name = _name; }
+
 void Mesh::RecalculateNormals()
 {
-	/*
 	// Reset normals for each tri
 	for (int i = 0; i < tris.size(); i++) {
 		for (int j = 0; j < TRI_VERTS; j++) {
-			tris[i].vertices[j].normal = glm::vec3(0, 0, 0);
+			verts[tris[i].vertices[j]].normal = glm::vec3(0, 0, 0);
 		}
 	}
 
@@ -197,17 +161,16 @@ void Mesh::RecalculateNormals()
 		glm::vec3 triNorm = tris[i].CalcNormal();
 
 		for (int j = 0; j < TRI_VERTS; j++) {
-			tris[i].vertices[j].normal += triNorm;
+			verts[tris[i].vertices[j]].normal += triNorm;
 		}
 	}
 
 	// Normalize normals for each vertex
 	for (int i = 0; i < tris.size(); i++) {
 		for (int j = 0; j < TRI_VERTS; j++) {
-			tris[i].vertices[j].normal = glm::normalize(tris[i].vertices[j].normal);
+			verts[tris[i].vertices[j]].normal = glm::normalize(verts[tris[i].vertices[j]].normal);
 		}
 	}
-	*/
 }
 
 int Mesh::GetVertexModel() { return 1; }
@@ -219,5 +182,5 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-
+	ClearTris();
 }

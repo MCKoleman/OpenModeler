@@ -1,5 +1,20 @@
 #include "fileHelper.h"
 
+// Returns whether the given file exists
+bool FileExists(const std::string& name) {
+    std::ifstream f(name.c_str());
+    return f.good();
+}
+
+// Rounds the value to the given precision
+std::string RoundToPrecision(float _val, size_t _precision)
+{
+    size_t nzero = _precision + 1;
+    std::string str = std::to_string(_val);
+    auto new_str = std::string(nzero - std::min(nzero, str.length()), '0') + str;
+    return new_str;
+}
+
 // Help parsing a string by token from:
 // https://stackoverflow.com/questions/14265581/parse-split-a-string-in-c-using-string-delimiter-standard-c
 void ParseStringByDelim(std::vector<std::string>& out, std::string str, std::string delim)

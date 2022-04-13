@@ -17,11 +17,12 @@ protected:
 	glm::vec3 forward = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	// Data
+	std::string name;
 	std::vector<Triangle> tris;
 	std::unordered_map<int, Vertex> verts;
 public:
 	Material defaultMat = Material();
-	int lastVertIndex = 0;
+	int lastVertIndex = -1;
 
 	// Calculates the basis of the mesh
 	void CalcBasis();
@@ -72,10 +73,14 @@ public:
 	// Returns the tri at the given index
 	Triangle GetTri(size_t index);
 
-	// Converts this mesh into a vertex array and stores it in the given array
-	void ConvertToVertData(float out[]);
-	// Converts this mesh into a vertex index array
-	void ConvertToIndexData(unsigned int out[]);
+	// Returns the name of the mesh
+	std::string GetName();
+	// Sets the name of the mesh
+	void SetName(std::string _name);
+	// Returns the tris of the mesh
+	std::vector<Triangle>& GetTris();
+	// Returns the vertices of the mesh
+	std::unordered_map<int, Vertex>& GetVerts();
 
 	// Clears the mesh of all tris
 	void ClearTris();

@@ -1,10 +1,22 @@
 #include "indexStructs.h"
 
+void ProgramIDs::GetUniformIDs()
+{
+    matrixID = glGetUniformLocation(shaderProgram, "MVP");
+    modelID = glGetUniformLocation(shaderProgram, "Model");
+    normalModelID = glGetUniformLocation(shaderProgram, "NormalModel");
+    lightPosID = glGetUniformLocation(shaderProgram, "LightPos");
+    lightColorID = glGetUniformLocation(shaderProgram, "LightColor");
+    viewPosID = glGetUniformLocation(shaderProgram, "ViewPos");
+    ambientStrengthID = glGetUniformLocation(shaderProgram, "AmbientStrength");
+    specularStrengthID = glGetUniformLocation(shaderProgram, "SpecularStrength");
+}
+
 // Returns the index of the given vertex id in the vertex list
 int FindVertIndex(std::vector<IndVertex>& verts, int id)
 {
     // If id is invalid, return null
-    if (id <= 0)
+    if (id < 0)
         return -1;
 
     // Find the given index in the vertices
@@ -21,7 +33,7 @@ int FindVertIndex(std::vector<IndVertex>& verts, int id)
 int FindVertIndex(std::vector<IndVec3>& verts, int id)
 {
     // If id is invalid, return null
-    if (id <= 0)
+    if (id < 0)
         return -1;
 
     // Find the given index in the vertices
@@ -38,7 +50,7 @@ int FindVertIndex(std::vector<IndVec3>& verts, int id)
 int FindFaceIndex(std::vector<FaceData>& faces, int id)
 {
     // If id is invalid, return null
-    if (id <= 0)
+    if (id < 0)
         return -1;
 
     // Find the given index in the vertices
@@ -55,7 +67,7 @@ int FindFaceIndex(std::vector<FaceData>& faces, int id)
 IndVertex FindVert(std::vector<IndVertex>& verts, int id)
 {
     // If id is invalid, return null
-    if (id <= 0)
+    if (id < 0)
         return IndVertex();
 
     // Find the given index in the vertices
@@ -72,7 +84,7 @@ IndVertex FindVert(std::vector<IndVertex>& verts, int id)
 IndVec3 FindVert(std::vector<IndVec3>& verts, int id)
 {
     // If id is invalid, return null
-    if (id <= 0)
+    if (id < 0)
         return IndVec3();
 
     // Find the given index in the vertices
@@ -89,7 +101,7 @@ IndVec3 FindVert(std::vector<IndVec3>& verts, int id)
 FaceData FindFace(std::vector<FaceData>& faces, int id)
 {
     // If id is invalid, return null
-    if (id <= 0)
+    if (id < 0)
         return FaceData();
 
     // Find the given index in the vertices

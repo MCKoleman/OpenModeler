@@ -76,17 +76,17 @@ Press `[Space]` to move mesh up
 Press `[Shift]` to move mesh down
 
 
-Press `[Ctrl + W]` to move camera forward
+Press `[Alt + W]` to move camera forward
 
-Press `[Ctrl + S]` to move camera back
+Press `[Alt + S]` to move camera back
 
-Press `[Ctrl + D]` to move camera right
+Press `[Alt + D]` to move camera right
 
-Press `[Ctrl + A]` to move camera left
+Press `[Alt + A]` to move camera left
 
-Press `[Ctrl + Space]` to move camera up
+Press `[Alt + Space]` to move camera up
 
-Press `[Ctrl + Shift]` to move camera down
+Press `[Alt + Shift]` to move camera down
 
 
 Press `[Q]` to scale mesh up
@@ -102,13 +102,13 @@ Press `[Right Arrow]` to rotate mesh right
 Press `[Left Arrow]` to rotate mesh left
 
 
-Press `[Ctrl + Up Arrow]` to rotate camera up
+Press `[Alt + Up Arrow]` to rotate camera up
 
-Press `[Ctrl + Down Arrow]` to rotate camera down
+Press `[Alt + Down Arrow]` to rotate camera down
 
-Press `[Ctrl + Right Arrow]` to rotate camera right
+Press `[Alt + Right Arrow]` to rotate camera right
 
-Press `[Ctrl + Left Arrow]` to rotate camera left
+Press `[Alt + Left Arrow]` to rotate camera left
 
 Press `[F]` to focus camera on the mesh
 
@@ -116,6 +116,8 @@ Press `[F]` to focus camera on the mesh
 Press `[Alt + Left Mouse Button]` to rotate camera with the mouse
 
 Press `[Alt + Right Mouse Button]` to move camera with the mouse
+
+Press `[Ctrl + S] to save the object to file`
 
 Press `[Esc]` to exit the program
 

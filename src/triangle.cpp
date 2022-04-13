@@ -1,14 +1,14 @@
 #include "triangle.h"
 
-void Triangle::SetMat(Material _mat)
+void Triangle::SetMat(std::string _mat)
 {
 	mat = _mat;
 }
 
-Triangle::Triangle() : Triangle(-1, -1, -1, Material(), -1) {}
-Triangle::Triangle(int i0, int i1, int i2) : Triangle(i0, i1, i2, Material(), -1) {}
-Triangle::Triangle(int i0, int i1, int i2, Material _mat) : Triangle(i0, i1, i2, _mat, -1) {}
-Triangle::Triangle(int i0, int i1, int i2, Material _mat, int _sg)
+Triangle::Triangle() : Triangle(-1, -1, -1, "", -1) {}
+Triangle::Triangle(int i0, int i1, int i2) : Triangle(i0, i1, i2, "", -1) {}
+Triangle::Triangle(int i0, int i1, int i2, std::string _mat) : Triangle(i0, i1, i2, _mat, -1) {}
+Triangle::Triangle(int i0, int i1, int i2, std::string _mat, int _sg)
 {
 	vertices[0] = i0;
 	vertices[1] = i1;

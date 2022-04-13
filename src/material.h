@@ -11,6 +11,8 @@ struct Material {
 	float d;
 	std::string mapkd;
 
+	void Reset();
+
 	Material();
 	Material(glm::vec3 _ka, glm::vec3 _kd);
 	Material(glm::vec3 _ka, glm::vec3 _kd, std::string _mapkd);

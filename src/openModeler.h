@@ -6,6 +6,7 @@
 #include "light.h"
 #include "camera.h"
 #include "input.h"
+#include "scene.h"
 #include "objReader.h"
 #include "objWriter.h"
 #include "pngWriter.h"

@@ -1,5 +1,16 @@
 #include "material.h"
 
+void Material::Reset()
+{
+	ka = glm::vec3();
+	kd = glm::vec3();
+	ks = glm::vec3();
+	ns = 0.0f;
+	ni = 1.0f;
+	d = 1.0f;
+	mapkd = "";
+}
+
 Material::Material()
 	: Material(glm::vec3(), glm::vec3(), glm::vec3(), 0, 1, 1, "") {}
 

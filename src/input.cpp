@@ -2,8 +2,10 @@
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
+bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
 {
+    Camera* camera = scene->GetCamera();
+    Mesh* mesh = scene->GetCurMesh();
     bool didReceiveInput = false;
 
     // Get window width and height
@@ -21,7 +23,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Move forward
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
         // Move camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->pos += camera->dir * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
         else
@@ -30,8 +32,11 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     }
     // Move back
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        // Move camera if ctrl is pressed
+        // Save on Ctrl+S
         if (CTRL_PRESS)
+            WriteObjToFile(scene, "../models/", scene->GetCurMesh()->GetName());
+        // Move camera if ctrl is pressed
+        else if (ALT_PRESS)
             camera->pos -= camera->dir * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
         else
@@ -41,7 +46,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Move right
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
         // Move camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->pos += camera->right * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
         else
@@ -51,7 +56,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Move left
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
         // Move camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->pos -= camera->right * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
         else
@@ -61,7 +66,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Move up
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
         // Move camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->pos += camera->up * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
         else
@@ -71,7 +76,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Move down
     if (SHIFT_PRESS) {
         // Move camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->pos -= camera->up * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
         else
@@ -103,7 +108,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Rotate up
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
         // Rotate camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->rotation.y += speeds->cameraTurnSpeed * deltaTime;
         // Otherwise rotate model
         else
@@ -113,7 +118,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Rotate down
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
         // Rotate camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->rotation.y -= speeds->cameraTurnSpeed * deltaTime;
         // Otherwise rotate model
         else
@@ -123,7 +128,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Rotate right
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
         // Rotate camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->rotation.x += speeds->cameraTurnSpeed * deltaTime;
         // Otherwise rotate model
         else
@@ -133,7 +138,7 @@ bool ProcessInput(GLFWwindow* window, Camera* camera, Mesh* mesh, float deltaTim
     // Rotate left
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
         // Rotate camera if ctrl is pressed
-        if (CTRL_PRESS)
+        if (ALT_PRESS)
             camera->rotation.x -= speeds->cameraTurnSpeed * deltaTime;
         // Otherwise rotate model
         else
