@@ -58,6 +58,7 @@ void ReadObjFromFile(Mesh* mesh, MaterialStorage* materials, std::string locatio
             // Check if line is a comment and skip it
             if (tempParse[0] == "#") {
                 // Skip this line
+                continue;
             }
 
             // Check if line is a group
@@ -190,7 +191,7 @@ void ReadObjFromFile(Mesh* mesh, MaterialStorage* materials, std::string locatio
             // Check if line is a material
 
             else if (tempParse[0] == "mtllib") {
-                mtlLoc = tempParse[1];
+                mtlLoc = location + tempParse[1];
             }
 
             // Check if line picks a material
@@ -217,7 +218,7 @@ void ReadObjFromFile(Mesh* mesh, MaterialStorage* materials, std::string locatio
     // -------------
     // Don't read material file if it is not requested
     if (mtlLoc != "") {
-        ReadMtlFromFile(materials, location, mtlLoc);
+        ReadMtlFromFile(materials, mtlLoc);
     }
 
     // Construct mesh
@@ -323,10 +324,8 @@ void BuildMesh(Mesh* mesh, std::vector<FaceData>& tempFaces, MaterialStorage* te
     }
 }
 
-void ReadMtlFromFile(MaterialStorage* materials, std::string location, std::string fileName)
+void ReadMtlFromFile(MaterialStorage* materials, std::string mtlLoc)
 {
-    std::string mtlLoc = location + fileName + ".mtl";
-
     // Open the material, exit if it can't be opened
     std::ifstream mtlFile(mtlLoc);
     if (!mtlFile.is_open()) {
@@ -353,6 +352,7 @@ void ReadMtlFromFile(MaterialStorage* materials, std::string location, std::stri
             // Check if line is a comment and skip it
             if (tempParse[0] == "#") {
                 // Skip this line
+                continue;
             }
 
             // Check if line is newmtl

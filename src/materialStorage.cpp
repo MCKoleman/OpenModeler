@@ -29,6 +29,16 @@ void MaterialStorage::Clear()
 	materials.clear();
 }
 
+bool MaterialStorage::IsNonDefault()
+{
+	for (auto iter = materials.begin(); iter != materials.end(); iter++) {
+		// If any non-default elements are found, return
+		if (iter->first != "default")
+			return true;
+	}
+	return false;
+}
+
 MaterialStorage::MaterialStorage()
 {
 	materials = std::unordered_map<std::string, Material*>();

@@ -3,5 +3,4 @@
 #include "fileHelper.h"
 
 void WriteObjToFile(Scene* scene, std::string location, std::string fileName);
-void WriteMtlToFile(Material* mat, std::string location, std::string fileName);
 void WriteMtlToFile(MaterialStorage* mats, std::string location, std::string fileName);

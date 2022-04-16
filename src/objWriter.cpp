@@ -32,11 +32,14 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 
 	// Write material
 	// --------------
-	//objFile << "mtllib " << fileName << ".mtl\n";
-	//objFile << "usemtl default\n\n";
+	if (scene->GetMats()->IsNonDefault()) {
+		objFile << "mtllib " << fileName << ".mtl\n";
+		WriteMtlToFile(scene->GetMats(), location, fileName);
+	}
 
 	// Write vertices
 	// --------------
+	objFile << "g\n";
 	int vertsSize = (int)verts.size();
 	bool anyTexts = false;
 	for (int i = 0; i < vertsSize; i++)
@@ -76,21 +79,29 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 	// -----------
 	objFile << "g default\n";
 	int trisSize = (int)tris.size();
+	std::string curMat = "";
 	for (int i = 0; i < trisSize; i++)
 	{
+		std::string tempMat = tris[i].mat;
 		auto triVerts = tris[i].vertices;
+
+		// Write material info if there is a change in materials
+		if (tempMat != curMat) {
+			curMat = tempMat;
+			objFile << "g " << curMat << "\n";
+		}
 
 		// Store texture data if it is used
 		if (anyTexts) {
-			objFile << "f " <<	triVerts[0] << "/" << triVerts[0] << "/" << triVerts[0] << " ";
-			objFile <<			triVerts[1] << "/" << triVerts[1] << "/" << triVerts[1] << " ";
-			objFile <<			triVerts[2] << "/" << triVerts[2] << "/" << triVerts[2] << "\n";
+			objFile << "f " <<	(triVerts[0]+1) << "/" << (triVerts[0]+1) << "/" << (triVerts[0]+1) << " ";
+			objFile <<			(triVerts[1]+1) << "/" << (triVerts[1]+1) << "/" << (triVerts[1]+1) << " ";
+			objFile <<			(triVerts[2]+1) << "/" << (triVerts[2]+1) << "/" << (triVerts[2]+1) << "\n";
 		}
 		// Only store normal and vertex data if there are no textures
 		else {
-			objFile << "f " <<	triVerts[0] << "//" << triVerts[0] << " ";
-			objFile <<			triVerts[1] << "//" << triVerts[1] << " ";
-			objFile <<			triVerts[2] << "//" << triVerts[2] << "\n";
+			objFile << "f " <<	(triVerts[0]+1) << "//" << (triVerts[0]+1) << " ";
+			objFile <<			(triVerts[1]+1) << "//" << (triVerts[1]+1) << " ";
+			objFile <<			(triVerts[2]+1) << "//" << (triVerts[2]+1) << "\n";
 		}
 	}
 	objFile << "# " << trisSize << " faces\n\n";
@@ -103,31 +114,10 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 	objFile.close();
 }
 
-void WriteMtlToFile(Material* mat, std::string location, std::string fileName)
-{
-	std::string mtlLoc = location + fileName + ".mtl";
-
-	// Open the object
-	std::ofstream mtlFile;
-	mtlFile.open(mtlLoc);
-
-	// Write header
-	mtlFile << "##\n";
-	mtlFile << "## " << fileName << ".mtl\n";
-	mtlFile << "##\n";
-	mtlFile << "## This file was generated using the OpenModeler program\n";
-	mtlFile << "## created by Manu Kristian Kolehmainen and Andres Maldonado-Martin.\n";
-	mtlFile << "## There is no copyright attributed to this file.\n";
-	mtlFile << "##\n";
-	mtlFile << "\n";
-
-	// Close file
-	mtlFile.close();
-}
-
 void WriteMtlToFile(MaterialStorage* mat, std::string location, std::string fileName)
 {
 	std::string mtlLoc = location + fileName + ".mtl";
+	auto mats = mat->GetAll();
 	// Open the object
 	std::ofstream mtlFile;
 	mtlFile.open(mtlLoc);
@@ -139,8 +129,37 @@ void WriteMtlToFile(MaterialStorage* mat, std::string location, std::string file
 	mtlFile << "## This file was generated using the OpenModeler program\n";
 	mtlFile << "## created by Manu Kristian Kolehmainen and Andres Maldonado-Martin.\n";
 	mtlFile << "## There is no copyright attributed to this file.\n";
-	mtlFile << "##\n";
-	mtlFile << "\n";
+	mtlFile << "##\n\n";
+
+	// Write all materials
+	for (auto iter = mats.begin(); iter != mats.end(); iter++) {
+		// Don't write the default mat to files
+		if (iter->first == "default")
+			continue;
+
+		// Always write the material name, ka, and kd
+		mtlFile << "newmtl " << iter->first << "\n";
+		mtlFile << "Ka " << iter->second->ka.r << " " << iter->second->ka.g << " " << iter->second->ka.b << "\n";
+		mtlFile << "Kd " << iter->second->kd.r << " " << iter->second->kd.g << " " << iter->second->kd.b << "\n";
+
+		// Only write non-default values for other mtl elements
+		if(iter->second->ks != glm::vec3(0,0,0))
+			mtlFile << "Ks " << iter->second->ks.r << " " << iter->second->ks.g << " " << iter->second->ks.b << "\n";
+
+		if (iter->second->mapkd != "")
+			mtlFile << "map_Kd " << iter->second->mapkd << "\n";
+
+		if (iter->second->d != 1.0f)
+			mtlFile << "d " << iter->second->d << "\n";
+
+		if (iter->second->ni != 1.0f)
+			mtlFile << "ni " << iter->second->ni << "\n";
+
+		if (iter->second->ns != 0.0f)
+			mtlFile << "ns " << iter->second->ns << "\n";
+
+		mtlFile << "\n";
+	}
 
 	// Close file
 	mtlFile.close();

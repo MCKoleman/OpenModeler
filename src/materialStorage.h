@@ -14,7 +14,8 @@ public:
 	Material* Get(std::string key);
 	std::unordered_map<std::string, Material*>& GetAll();
 	void Clear();
-	
+	bool IsNonDefault();
+
 	MaterialStorage();
 	~MaterialStorage();
 };

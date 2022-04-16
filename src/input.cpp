@@ -2,7 +2,7 @@
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
+bool ProcessInput(GLFWwindow* window, Scene* scene, InputLocks* locks, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
 {
     Camera* camera = scene->GetCamera();
     Mesh* mesh = scene->GetCurMesh();
@@ -33,9 +33,13 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts
     // Move back
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
         // Save on Ctrl+S
-        if (CTRL_PRESS)
-            WriteObjToFile(scene, "../models/", scene->GetCurMesh()->GetName());
-        // Move camera if ctrl is pressed
+        if (CTRL_PRESS) {
+            if (!locks->lockCtrlS) {
+                WriteObjToFile(scene, "../models/", scene->GetCurMesh()->GetName());
+                locks->lockCtrlS = true;
+            }
+        }
+        // Move camera if alt is pressed
         else if (ALT_PRESS)
             camera->pos -= camera->dir * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
@@ -45,7 +49,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts
     }
     // Move right
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        // Move camera if ctrl is pressed
+        // Move camera if alt is pressed
         if (ALT_PRESS)
             camera->pos += camera->right * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
@@ -55,7 +59,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts
     }
     // Move left
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        // Move camera if ctrl is pressed
+        // Move camera if alt is pressed
         if (ALT_PRESS)
             camera->pos -= camera->right * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
@@ -65,7 +69,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts
     }
     // Move up
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        // Move camera if ctrl is pressed
+        // Move camera if alt is pressed
         if (ALT_PRESS)
             camera->pos += camera->up * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
@@ -75,7 +79,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts
     }
     // Move down
     if (SHIFT_PRESS) {
-        // Move camera if ctrl is pressed
+        // Move camera if alt is pressed
         if (ALT_PRESS)
             camera->pos -= camera->up * deltaTime * speeds->cameraMoveSpeed;
         // Otherwise move model
@@ -191,6 +195,15 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, float deltaTime, SpeedConsts
         camera->CalcBasis();
         mesh->CalcBasis();
     }
+    // If no input was received, clear all input locks
+    else {
+        locks->ClearLocks();
+    }
 
     return didReceiveInput;
+}
+
+// Resets all locks on keys
+void InputLocks::ClearLocks() {
+    lockCtrlS = false;
 }

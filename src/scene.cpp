@@ -30,11 +30,11 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 		outVertIndex++;
 
 		// Color
-		vertices[outVertIndex] = glm::clamp(vertMat->kd.x + vertMat->ka.x, 0.0f, 1.0f);
+		vertices[outVertIndex] = glm::clamp(vertMat->kd.r + vertMat->ka.r, 0.0f, 1.0f);
 		outVertIndex++;
-		vertices[outVertIndex] = glm::clamp(vertMat->kd.y + vertMat->ka.y, 0.0f, 1.0f);
+		vertices[outVertIndex] = glm::clamp(vertMat->kd.g + vertMat->ka.g, 0.0f, 1.0f);
 		outVertIndex++;
-		vertices[outVertIndex] = glm::clamp(vertMat->kd.z + vertMat->ka.z, 0.0f, 1.0f);
+		vertices[outVertIndex] = glm::clamp(vertMat->kd.b + vertMat->ka.b, 0.0f, 1.0f);
 		outVertIndex++;
 	}
 
