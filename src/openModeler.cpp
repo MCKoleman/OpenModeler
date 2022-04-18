@@ -25,7 +25,7 @@ int main()
         glm::vec3(-1.0f, -1.0f, -1.0f),     // Light dir
         glm::vec3(1.0f, 1.0f, 1.0f),        // Light color
         0.1f,                               // Ambient strength
-        0.5f));                              // Specular strength);
+        7.0f));                             // Specular strength);
     scene->GetMats()->AddMat("default", options.defaultColor);
 
     // Read mesh
