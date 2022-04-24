@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "materialStorage.h"
 #include "meshStorage.h"
+#include "itriangle.h"
 
 class Scene
 {
@@ -14,7 +15,10 @@ private:
 	MeshStorage* meshes;
 	Mesh* curMesh;
 public:
+	glm::vec3 bgColor = glm::vec3(255, 87, 51);
+
 	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize);
+	void GetTris(std::vector<ITriangle>& outTris);
 
 	Camera* GetCamera();
 	Light* GetLight();
