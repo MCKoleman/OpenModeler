@@ -10,3 +10,4 @@
 #include "objReader.h"
 #include "objWriter.h"
 #include "pngWriter.h"
+#include "selection.h"

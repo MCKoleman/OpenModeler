@@ -66,6 +66,9 @@ int main()
     int prevX = -1;
     int prevY = -1;
 
+    // Get selection
+    Selection sel = Selection();
+
     // Track time
     double lastTime = glfwGetTime();
     double currentTime = glfwGetTime();
@@ -81,8 +84,8 @@ int main()
         deltaTime = float(currentTime - lastTime);
 
         // Process input and render
-        ProcessInput(window, scene, &locks, deltaTime, &speeds, &prevX, &prevY);
-        OpenGLDraw(scene, &ids, indicesSize, indices);
+        ProcessInput(window, scene, &sel, &locks, deltaTime, &speeds, &prevX, &prevY);
+        OpenGLDraw(scene, &sel, &ids, indicesSize, indices);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
