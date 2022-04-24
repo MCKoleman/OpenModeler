@@ -3,7 +3,8 @@
 void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize)
 {
 	auto verts = curMesh->GetVerts();
-	auto tris = curMesh->GetTris();
+	std::vector<Triangle> tris;
+	curMesh->GetTris(tris);
 	glm::vec3 pos = curMesh->GetPos();
 
 	// Track out indices separate from loop

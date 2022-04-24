@@ -1,5 +1,6 @@
 #pragma once
 #include "fileHelper.h"
+#include "mesh.h"
 #include "materialStorage.h"
 #include "indexStructs.h"
 
