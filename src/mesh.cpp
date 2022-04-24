@@ -127,7 +127,8 @@ int Mesh::GetIndexCount()
 {
 	int count = 0;
 	for (int i = 0; i < faces.size(); i++) {
-		count += faces[i].GetNumVerts();
+		// ngon will create (n-2) triangles with 3 vertices each
+		count += (faces[i].GetNumVerts() - 2) * 3;
 	}
 	return count;
 }
@@ -144,6 +145,19 @@ std::vector<Triangle>& Mesh::GetTris(std::vector<Triangle>& _tris)
 		faces[i].GetTri(_tris, verts);
 	}
 	return _tris;
+}
+
+std::vector<std::string>& Mesh::GetMatsForVert(std::vector<std::string>& _mats, int vertId)
+{
+	for (int i = 0; i < faces.size(); i++) {
+		for (int j = 0; j < TRI_VERTS; j++) {
+			if (faces[i].vertices[j] == vertId) {
+				_mats.push_back(faces[i].mat);
+				break;
+			}
+		}
+	}
+	return _mats;
 }
 
 std::unordered_map<int, Vertex>& Mesh::GetVerts()

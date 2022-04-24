@@ -80,6 +80,8 @@ public:
 	std::vector<Face>& GetFaces();
 	// Returns the tris of the mesh
 	std::vector<Triangle>& GetTris(std::vector<Triangle>& _tris);
+	// Returns all mats of the mesh for the given vertex
+	std::vector<std::string>& GetMatsForVert(std::vector<std::string>& _mats, int vertId);
 	// Returns the vertices of the mesh
 	std::unordered_map<int, Vertex>& GetVerts();
 

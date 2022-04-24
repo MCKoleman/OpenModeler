@@ -98,7 +98,7 @@ int main()
     OpenGLCleanup(&ids);
     delete[] vertices;
     delete[] indices;
-    //delete scene;
+    delete scene;
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

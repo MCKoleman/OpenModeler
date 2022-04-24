@@ -2,51 +2,56 @@
 
 void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize)
 {
-	auto verts = curMesh->GetVerts();
+	std::unordered_map<int, Vertex> verts = curMesh->GetVerts();
 	std::vector<Triangle> tris;
 	curMesh->GetTris(tris);
 	glm::vec3 pos = curMesh->GetPos();
+	std::cout << "Writing " << vertsSize << " vertices to VAO, " << verts.size() << " exist" << std::endl;
+	std::cout << "Writing " << indicesSize << " indices to VAO, " << tris.size() << " exist" << std::endl;
 
+	int tempHighIndex = -1;
 	// Track out indices separate from loop
-	size_t outVertIndex = 0;
 	for (int i = 0; i < verts.size(); i++) {
 		glm::vec3 vertPos = verts[i].pos;
 		glm::vec3 vertNorm = verts[i].normal;
-		Material* vertMat = mats->Get(tris[i].mat);
+
+		// Get all mats for vertex
+		std::vector<std::string> _matKeys;
+		std::vector<Material*> _mats;
+		curMesh->GetMatsForVert(_matKeys, i);
+		for (int j = 0; j < _matKeys.size(); j++) {
+			_mats.push_back(mats->Get(_matKeys[j]));
+		}
+		Material vertMat = Material::Average(_mats);
 
 		// Position
-		vertices[outVertIndex] = vertPos.x + pos.x;
-		outVertIndex++;
-		vertices[outVertIndex] = vertPos.y + pos.y;
-		outVertIndex++;
-		vertices[outVertIndex] = vertPos.z + pos.z;
-		outVertIndex++;
+		// For every vertex, 9 elements are stored, so the array index is 9*i + <elem pos>
+		vertices[9 * i + 0] = vertPos.x;
+		vertices[9 * i + 1] = vertPos.y;
+		vertices[9 * i + 2] = vertPos.z;
 
 		// Normal
-		vertices[outVertIndex] = vertNorm.x;
-		outVertIndex++;
-		vertices[outVertIndex] = vertNorm.y;
-		outVertIndex++;
-		vertices[outVertIndex] = vertNorm.z;
-		outVertIndex++;
+		vertices[9 * i + 3] = vertNorm.x;
+		vertices[9 * i + 4] = vertNorm.y;
+		vertices[9 * i + 5] = vertNorm.z;
 
 		// Color
-		vertices[outVertIndex] = glm::clamp(vertMat->kd.r + vertMat->ka.r, 0.0f, 1.0f);
-		outVertIndex++;
-		vertices[outVertIndex] = glm::clamp(vertMat->kd.g + vertMat->ka.g, 0.0f, 1.0f);
-		outVertIndex++;
-		vertices[outVertIndex] = glm::clamp(vertMat->kd.b + vertMat->ka.b, 0.0f, 1.0f);
-		outVertIndex++;
+		vertices[9 * i + 6] = glm::clamp(vertMat.kd.r + vertMat.ka.r, 0.0f, 1.0f);
+		vertices[9 * i + 7] = glm::clamp(vertMat.kd.g + vertMat.ka.g, 0.0f, 1.0f);
+		vertices[9 * i + 8] = glm::clamp(vertMat.kd.b + vertMat.ka.b, 0.0f, 1.0f);
+
+		tempHighIndex = 9 * i + 8;
 	}
+	std::cout << "Highest element written to vertices: " << tempHighIndex << std::endl;
 
 	// Track out indices separate from loop
-	size_t outIndex = 0;
 	for (int i = 0; i < tris.size(); i++) {
 		for (int j = 0; j < TRI_VERTS; j++) {
-			indices[outIndex] = tris[i].vertices[j];
-			outIndex++;
+			indices[i*TRI_VERTS + j] = tris[i].vertices[j];
+			tempHighIndex = i * TRI_VERTS + j;
 		}
 	}
+	std::cout << "Highest element written to indices: " << tempHighIndex << std::endl;
 }
 
 void Scene::GetTris(std::vector<ITriangle>& outTris)
@@ -122,5 +127,4 @@ Scene::~Scene()
 	delete light;
 	delete mats;
 	delete meshes;
-	delete curMesh;
 }
