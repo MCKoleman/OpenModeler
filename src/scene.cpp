@@ -49,6 +49,20 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 	}
 }
 
+void Scene::GetTris(std::vector<ITriangle>& outTris)
+{
+	for (auto iter = meshes->GetAll().begin(); iter != meshes->GetAll().end(); ++iter) {
+		Mesh* tempMesh = meshes->Get(iter->first);
+		std::vector<Triangle> tris;
+		tempMesh->GetTris(tris);
+
+		// Convert all tris to info tris
+		for (int i = 0; i < tris.size(); i++) {
+			outTris.push_back(ITriangle(tris[i], tempMesh->GetVerts()));
+		}
+	}
+}
+
 Camera* Scene::GetCamera() { return camera; }
 Light* Scene::GetLight() { return light; }
 MaterialStorage* Scene::GetMats() { return mats; }
@@ -98,6 +112,8 @@ Scene::Scene()
 	mats = new MaterialStorage();
 	meshes = new MeshStorage();
 	curMesh = new Mesh();
+
+	meshes->AddMesh("defaultMesh", curMesh);
 }
 
 Scene::~Scene()

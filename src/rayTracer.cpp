@@ -75,7 +75,8 @@ Strint RayTracer::getClosestTriangle(std::unordered_map<std::string, Mesh*>& mes
 		Mesh* mesh = iter->second;
 
 		auto verts = mesh->GetVerts();
-		auto tris = mesh->GetTris();
+		std::vector<Triangle> tris;
+		mesh->GetTris(tris);
 
 		for (int i = 0; i < tris.size(); i++)
 		{
@@ -112,7 +113,7 @@ glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 	else
 	{
 		Mesh* mesh = scene->GetMeshes()->Get(foundTriangle.str);
-		Triangle triangle = mesh->GetTri(foundTriangle.id);
+		Triangle triangle = Triangle();//mesh->GetTri(foundTriangle.id);
 		Material* mat = scene->GetMats()->Get(triangle.mat);
 
 		auto verts = mesh->GetVerts();
@@ -127,6 +128,7 @@ glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 		glm::vec3 h = bisector(p, -scene->GetLight()->dir);
 
 		// TODO: Perform color calculation and return color
+		return glm::vec3();
 	}
 }
 
@@ -145,8 +147,8 @@ glm::vec3* RayTracer::RayTrace(Scene* scene)
 	{
 		for (int j = 0; i < SCR_WIDTH; j++)
 		{
-			float u = left + (right - left) * (j + 0.5) / SCR_WIDTH;
-			float v = bottom + (top - bottom) * (i + 0.5) / SCR_HEIGHT;
+			float u = left + (right - left) * (j + 0.5f) / SCR_WIDTH;
+			float v = bottom + (top - bottom) * (i + 0.5f) / SCR_HEIGHT;
 
 			Ray viewRay = generateRay(scene->GetCamera(), u, v);
 
