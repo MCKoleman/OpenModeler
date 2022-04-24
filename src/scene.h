@@ -14,6 +14,8 @@ private:
 	MeshStorage* meshes;
 	Mesh* curMesh;
 public:
+	glm::vec3 bgColor = glm::vec3(255, 87, 51);
+
 	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize);
 
 	Camera* GetCamera();
