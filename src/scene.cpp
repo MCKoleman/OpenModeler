@@ -74,7 +74,7 @@ void Scene::CalcRenderTris()
 
 		// Convert all tris to info tris
 		for (int i = 0; i < tempTris.size(); i++) {
-			renderTris.push_back(ITriangle(tempTris[i], tempMesh->GetVerts(), i, mi));
+			renderTris.push_back(ITriangle(tempTris[i], tempMesh->GetVerts(), i, mi, tempTris[i].tag));
 		}
 		mi++;
 	}
@@ -92,7 +92,7 @@ void Scene::CalcRenderTris()
 			renderTris[i].vertices[1].id, 
 			renderTris[i].vertices[2].id,
 			renderTris[i].normal, renderTris[i].center,
-			renderTris[i].mat, renderTris[i].shadingGroup));
+			renderTris[i].mat, renderTris[i].shadingGroup, renderTris[i].tag));
 	}
 }
 

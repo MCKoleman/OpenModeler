@@ -16,6 +16,7 @@ protected:
 	glm::vec3 up = glm::vec3(0.0f, 0.0f, 1.0f);
 	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 forward = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 pivot = glm::vec3(0, 0, 0);
 
 	// Data
 	std::string name;
@@ -27,6 +28,8 @@ public:
 
 	// Calculates the basis of the mesh
 	void CalcBasis();
+	// Calculates the pivot of the mesh
+	void CalcPivot();
 
 	// Getter functions
 	// Returns the up vector of this mesh
@@ -41,6 +44,8 @@ public:
 	glm::vec3 GetRotation();
 	// Returns the scale of the mesh
 	glm::vec3 GetScale();
+	// Returns the pivot of the mesh
+	glm::vec3 GetPivot();
 
 	// Setter functions
 	// Translate the mesh by the given vector

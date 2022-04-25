@@ -13,22 +13,19 @@ void Face::GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& 
 	}
 	// Handle triangles
 	else if (vertices.size() == 3) {
-		tris.push_back(GetClockwiseTri(
-			IndVertex(vertices[0], tempVerts[vertices[0]]),
-			IndVertex(vertices[1], tempVerts[vertices[1]]),
-			IndVertex(vertices[2], tempVerts[vertices[2]]), mat, shadingGroup));
+		tris.push_back(Triangle(vertices[0], vertices[1], vertices[2], normal, center, mat, shadingGroup, TriTag::CONFIRMED_CORRECT));
 	}
 	// Handle quads
 	else if (vertices.size() == 4) {
 		float dist1 = glm::distance(tempVerts[vertices[0]].pos, tempVerts[vertices[2]].pos);
 		float dist2 = glm::distance(tempVerts[vertices[1]].pos, tempVerts[vertices[3]].pos);
 		if (dist1 > dist2) {
-			tris.push_back(Triangle(vertices[0], vertices[1], vertices[3], normal, center, mat, shadingGroup));
-			tris.push_back(Triangle(vertices[1], vertices[2], vertices[3], normal, center, mat, shadingGroup));
+			tris.push_back(Triangle(vertices[0], vertices[1], vertices[3], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
+			tris.push_back(Triangle(vertices[1], vertices[2], vertices[3], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
 		}
 		else {
-			tris.push_back(Triangle(vertices[0], vertices[1], vertices[2], normal, center, mat, shadingGroup));
-			tris.push_back(Triangle(vertices[0], vertices[2], vertices[3], normal, center, mat, shadingGroup));
+			tris.push_back(Triangle(vertices[0], vertices[1], vertices[2], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
+			tris.push_back(Triangle(vertices[0], vertices[2], vertices[3], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
 		}
 	}
 	// Handle ngons
@@ -39,12 +36,12 @@ void Face::GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& 
 				float dist2 = glm::distance(tempVerts[vertices[i + 1]].pos, tempVerts[vertices[i + 3]].pos);
 
 				if (dist1 > dist2) {
-					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 3], normal, center, mat, shadingGroup));
-					tris.push_back(Triangle(vertices[i + 1], vertices[i + 2], vertices[i + 3], normal, center, mat, shadingGroup));
+					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 3], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
+					tris.push_back(Triangle(vertices[i + 1], vertices[i + 2], vertices[i + 3], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
 				}
 				else {
-					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 2], normal, center, mat, shadingGroup));
-					tris.push_back(Triangle(vertices[i], vertices[i + 2], vertices[i + 3], normal, center, mat, shadingGroup));
+					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 2], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
+					tris.push_back(Triangle(vertices[i], vertices[i + 2], vertices[i + 3], normal, center, mat, shadingGroup, TriTag::UNCONFIRMED));
 				}
 				// If two tris were handled at once, skip the next one
 				i++;
@@ -65,11 +62,11 @@ Triangle Face::GetClockwiseTri(IndVertex a, IndVertex b, IndVertex c, std::strin
 	//	return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
 	if (IsCCW(a.ver.pos, b.ver.pos, c.ver.pos)) {
 		//std::cout << "Used triangulation method 1 (abc)" << std::endl;
-		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
+		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg, TriTag::UNCONFIRMED);
 	}
 	else {
 		//std::cout << "Used triangulation method 2 (acb)" << std::endl;
-		return Triangle(a.id, c.id, b.id, normal, center, _mat, _sg);
+		return Triangle(a.id, c.id, b.id, normal, center, _mat, _sg, TriTag::UNCONFIRMED);
 	}
 }
 

@@ -36,6 +36,7 @@ int main()
     ReadObjFromFile(displayMesh, scene->GetMats(), "../models/", options.objName);
     displayMesh->Scale(glm::vec3(options.objScale, options.objScale, options.objScale));
     displayMesh->SetPos(options.objPos);
+    displayMesh->CalcPivot();
 
     // Load up model into vertice and indice structures
     // Get vertices

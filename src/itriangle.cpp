@@ -14,6 +14,10 @@ void ITriangle::CalcNormal()
 
 void ITriangle::Reorient(std::vector<ITriangle>& tris)
 {
+	// Don't reorient confirmed correct tris
+	if (tag == TriTag::CONFIRMED_CORRECT)
+		return;
+
 	// Shoot ray just off of the surface of the tri into the whole mesh
 	Ray normRay = Ray(center + normal * 0.0001f, normal);
 
@@ -24,6 +28,7 @@ void ITriangle::Reorient(std::vector<ITriangle>& tris)
 		vertices[2] = tempVert;
 		CalcNormal();
 	}
+	tag = TriTag::CONFIRMED_CORRECT;
 }
 
 ITriangle::ITriangle()
@@ -46,8 +51,9 @@ ITriangle::ITriangle(IndVertex i0, IndVertex i1, IndVertex i2, std::string _mat,
 	CalcNormal();
 }
 
-ITriangle::ITriangle(Triangle _tri, std::unordered_map<int, Vertex>& _verts, int _triIndex, int _meshIndex)
+ITriangle::ITriangle(Triangle _tri, std::unordered_map<int, Vertex>& _verts, int _triIndex, int _meshIndex, TriTag _tag)
 {
+	tag = _tag;
 	triIndex = _triIndex;
 	meshIndex = _meshIndex;
 	mat = _tri.mat;
