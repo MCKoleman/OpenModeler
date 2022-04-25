@@ -1,6 +1,6 @@
 #include "scene.h"
 
-void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize)
+void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel)
 {
 	CalcRenderTris();
 	//std::cout << "Writing " << vertsSize << " vertices to VAO, " << verts.size() << " exist" << std::endl;
@@ -8,7 +8,10 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 
 	int tempHighIndex = -1;
 	int startIndex = 0;
-
+	std::set<int> selectedVerts;
+	if(_sel != nullptr)
+		_sel->GetSelectedVerts(selectedVerts);
+	
 	for (auto iter = GetMeshes()->GetAll().begin(); iter != GetMeshes()->GetAll().end(); ++iter) {
 		Mesh* curMesh = iter->second;
 		std::unordered_map<int, Vertex> verts = curMesh->GetVerts();
@@ -27,23 +30,25 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 			}
 			Material vertMat = Material::Average(_mats);
 
+			// Selection
+			vertices[startIndex + VERT_SHADER_SIZE * i + 0] = GetVertSelection(selectedVerts, i);
 			// Position
-			// For every vertex, 9 elements are stored, so the array index is 9*i + <elem pos>
-			vertices[startIndex + 9 * i + 0] = vertPos.x;
-			vertices[startIndex + 9 * i + 1] = vertPos.y;
-			vertices[startIndex + 9 * i + 2] = vertPos.z;
+			// For every vertex, 10 elements are stored, so the array index is 10*i + 1 + <elem pos>
+			vertices[startIndex + VERT_SHADER_SIZE * i + 1] = vertPos.x;
+			vertices[startIndex + VERT_SHADER_SIZE * i + 2] = vertPos.y;
+			vertices[startIndex + VERT_SHADER_SIZE * i + 3] = vertPos.z;
 
 			// Normal
-			vertices[startIndex + 9 * i + 3] = vertNorm.x;
-			vertices[startIndex + 9 * i + 4] = vertNorm.y;
-			vertices[startIndex + 9 * i + 5] = vertNorm.z;
+			vertices[startIndex + VERT_SHADER_SIZE * i + 4] = vertNorm.x;
+			vertices[startIndex + VERT_SHADER_SIZE * i + 5] = vertNorm.y;
+			vertices[startIndex + VERT_SHADER_SIZE * i + 6] = vertNorm.z;
 
 			// Color
-			vertices[startIndex + 9 * i + 6] = glm::clamp(vertMat.kd.r + vertMat.ka.r, 0.0f, 1.0f);
-			vertices[startIndex + 9 * i + 7] = glm::clamp(vertMat.kd.g + vertMat.ka.g, 0.0f, 1.0f);
-			vertices[startIndex + 9 * i + 8] = glm::clamp(vertMat.kd.b + vertMat.ka.b, 0.0f, 1.0f);
+			vertices[startIndex + VERT_SHADER_SIZE * i + 7] = glm::clamp(vertMat.kd.r + vertMat.ka.r, 0.0f, 1.0f);
+			vertices[startIndex + VERT_SHADER_SIZE * i + 8] = glm::clamp(vertMat.kd.g + vertMat.ka.g, 0.0f, 1.0f);
+			vertices[startIndex + VERT_SHADER_SIZE * i + 9] = glm::clamp(vertMat.kd.b + vertMat.ka.b, 0.0f, 1.0f);
 
-			tempHighIndex = 9 * i + 8;
+			tempHighIndex = VERT_SHADER_SIZE * i + (VERT_SHADER_SIZE - 1);
 		}
 		startIndex += (int)verts.size();
 	}
@@ -94,6 +99,14 @@ void Scene::CalcRenderTris()
 			renderTris[i].normal, renderTris[i].center,
 			renderTris[i].mat, renderTris[i].shadingGroup, renderTris[i].tag));
 	}
+}
+
+float Scene::GetVertSelection(std::set<int>& verts, int i)
+{
+	if (verts.size() != 0)
+		return (verts.find(i) != verts.end() ? 1.0f : 0.0f);
+	else
+		return 0.0f;
 }
 
 std::unordered_map<int, Vertex>& Scene::GetVerts()

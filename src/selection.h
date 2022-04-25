@@ -18,6 +18,8 @@ private:
 public:
 	// Returns the entire selection as a selection of vertices
 	void GetSelectedVerts(std::vector<int>& _verts);
+	// Returns the entire selection as a selection of vertices
+	void GetSelectedVerts(std::set<int>& _verts);
 
 	// Selects the face with the given ID
 	void SelectFace(int _id);

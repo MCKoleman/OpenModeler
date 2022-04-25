@@ -17,6 +17,23 @@ void Selection::GetSelectedVerts(std::vector<int>& _verts)
 	}
 }
 
+// Returns the entire selection as a selection of vertices
+void Selection::GetSelectedVerts(std::set<int>& _verts)
+{
+	// Add all faces to selection
+	for (auto iter = selFaces.begin(); iter != selFaces.end(); ++iter) {
+		Face tempFace = selMesh->GetFace(*iter);
+		for (int i = 0; i < tempFace.GetNumVerts(); i++) {
+			_verts.emplace(tempFace.vertices[i]);
+		}
+	}
+
+	// Add all verts to selection
+	for (auto iter = selVerts.begin(); iter != selVerts.end(); ++iter) {
+		_verts.emplace(*iter);
+	}
+}
+
 // Selects the face with the given ID
 void Selection::SelectFace(int _id) { selFaces.emplace(_id); }
 // Selects the vertex with the given ID

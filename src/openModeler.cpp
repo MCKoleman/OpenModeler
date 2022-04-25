@@ -40,7 +40,7 @@ int main()
 
     // Load up model into vertice and indice structures
     // Get vertices
-    int vertsSize = scene->GetVertCount() * 9;
+    int vertsSize = scene->GetVertCount() * 10;
     int indicesSize = scene->GetIndexCount();
     float* vertices = new float[vertsSize];
     unsigned int* indices = new unsigned int[indicesSize];
@@ -48,7 +48,7 @@ int main()
 
     // Print vertices and indices
     if (options.print == 1) {
-        PrintArray("Printing vertices:", vertices, vertsSize, 9);
+        PrintArray("Printing vertices:", vertices, vertsSize, 10);
         PrintArray("Printing indices:", indices, indicesSize, 3);
     }
 
@@ -94,12 +94,12 @@ int main()
             delete[] indices;
 
             // Set new data
-            vertsSize = scene->GetVertCount() * 9;
+            vertsSize = scene->GetVertCount() * 10;
             indicesSize = scene->GetIndexCount();
             vertices = new float[vertsSize];
             indices = new unsigned int[indicesSize];
 
-            scene->GetVAO(vertices, vertsSize, indices, indicesSize);
+            scene->GetVAO(vertices, vertsSize, indices, indicesSize, &sel);
             OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
 
             // Reset rerender

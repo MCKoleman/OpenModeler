@@ -53,15 +53,18 @@ void OpenGLInitBuffers(ProgramIDs* ids, int vertsSize, float* vertices, int indi
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ids->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(indices[0]), indices, GL_STATIC_DRAW);
 
-    // Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+    // Selection
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Normal
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Position
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)(1 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // Color
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+    // Normal
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)(4 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    // Color
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)(7 * sizeof(float)));
+    glEnableVertexAttribArray(3);
     glBindVertexArray(0);
 
     // Get uniform locations

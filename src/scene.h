@@ -6,6 +6,7 @@
 #include "meshStorage.h"
 #include "itriangle.h"
 #include "ray.h"
+#include "selection.h"
 
 class Scene
 {
@@ -20,8 +21,9 @@ private:
 public:
 	glm::vec3 bgColor = glm::vec3(255, 87, 51);
 
-	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize);
+	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel = nullptr);
 	void CalcRenderTris();
+	float GetVertSelection(std::set<int>& verts, int i);
 
 	std::unordered_map<int, Vertex>& GetVerts();
 	std::vector<Triangle>& GetTris();
