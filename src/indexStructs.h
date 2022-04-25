@@ -18,6 +18,7 @@ struct ProgramIDs
 	unsigned int viewPosID;
 	unsigned int ambientStrengthID;
 	unsigned int specularStrengthID;
+	unsigned int winScaleID;
 
 	void GetUniformIDs();
 };
