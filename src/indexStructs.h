@@ -1,6 +1,8 @@
 #pragma once
-#include "mesh.h"
 #include "glIncludes.h"
+#include "vertex.h"
+#include <vector>
+#include <string>
 
 struct ProgramIDs
 {

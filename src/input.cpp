@@ -2,7 +2,7 @@
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-bool ProcessInput(GLFWwindow* window, Scene* scene, InputLocks* locks, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
+bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* locks, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
 {
     Camera* camera = scene->GetCamera();
     Mesh* mesh = scene->GetCurMesh();
@@ -105,7 +105,13 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, InputLocks* locks, float del
     }
     // Scale down
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        mesh->SetScale(mesh->GetScale() - glm::vec3(speeds->modelScaleRate * deltaTime) * mesh->GetScale());
+        // Extrude on Ctrl+E
+        if (CTRL_PRESS) {
+            locks->rerender = true;
+        }
+        else {
+            mesh->SetScale(mesh->GetScale() - glm::vec3(speeds->modelScaleRate * deltaTime) * mesh->GetScale());
+        }
         didReceiveInput = true;
     }
 
@@ -151,38 +157,60 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, InputLocks* locks, float del
     }
 
     // Mouse input
-    if (ALT_PRESS && MOUSE_PRESS) {
-        // Track mouse movement
-        double mouseX, mouseY;
-        glfwGetCursorPos(window, &mouseX, &mouseY);
-        int xPos = (int)glm::floor(mouseX);
-        int yPos = (int)glm::floor(mouseY);
+    if (MOUSE_PRESS) {
+        // Handle moving with mouse
+        if (ALT_PRESS) {
+            // Track mouse movement
+            double mouseX, mouseY;
+            glfwGetCursorPos(window, &mouseX, &mouseY);
+            int xPos = (int)glm::floor(mouseX);
+            int yPos = (int)glm::floor(mouseY);
 
-        // Reset previous positions
-        if (*prevX < 0)
-            *prevX = xPos;
-        if (*prevY < 0)
-            *prevY = yPos;
+            // Reset previous positions
+            if (*prevX < 0)
+                *prevX = xPos;
+            if (*prevY < 0)
+                *prevY = yPos;
 
-        float deltaX = float(*prevX - xPos);
-        float deltaY = float(*prevY - yPos);
+            float deltaX = float(*prevX - xPos);
+            float deltaY = float(*prevY - yPos);
 
-        // Alt + LMB to rotate
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            // Apply changes to camera
-            camera->rotation.x += speeds->mouseTurnSpeed * deltaTime * deltaX;
-            camera->rotation.y += speeds->mouseTurnSpeed * deltaTime * deltaY;
+            // Alt + LMB to rotate
+            if (LEFT_MOUSE_PRESS) {
+                // Apply changes to camera
+                camera->rotation.x += speeds->mouseTurnSpeed * deltaTime * deltaX;
+                camera->rotation.y += speeds->mouseTurnSpeed * deltaTime * deltaY;
+            }
+            // Alt + RMB to move
+            else if (RIGHT_MOUSE_PRESS) {
+                // Apply changes to camera
+                camera->pos += camera->right * speeds->mouseMoveSpeed * deltaTime * deltaX;
+                camera->pos += camera->up * speeds->mouseMoveSpeed * deltaTime * deltaY;
+            }
+
+            // Keep mouse where it was clicked
+            glfwSetCursorPos(window, (float)(*prevX), (float)(*prevY));
+            didReceiveInput = true;
         }
-        // Alt + RMB to move
-        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            // Apply changes to camera
-            camera->pos += camera->right * speeds->mouseMoveSpeed * deltaTime * deltaX;
-            camera->pos += camera->up * speeds->mouseMoveSpeed * deltaTime * deltaY;
+        // Handle addition to selection
+        else if (LEFT_MOUSE_PRESS && SHIFT_PRESS) {
+            // If mouse is over the object, add it to selection
+            //sel->SelectFace(<faceIndex>);
+            //sel->SelectVert(<vertIndex>);
+            // If the selected face or vert was already selected, deselect it
+            //sel->DeselectFace(<faceIndex>);
+            //sel->DeselectVert(<vertIndex>);
         }
-
-        // Keep mouse where it was clicked
-        glfwSetCursorPos(window, (float)(*prevX), (float)(*prevY));
-        didReceiveInput = true;
+        // Handle single selection/deselection
+        else if (LEFT_MOUSE_PRESS) {
+            // If mouse is over the object, replace the selection with it
+            //sel->ClearSelection();
+            //sel->SelectFace(<faceIndex>);
+            //sel->SelectVert(<vertIndex>);
+            // If the selected face or vert was already selected, deselect it
+            //sel->DeselectFace(<faceIndex>);
+            //sel->DeselectVert(<vertIndex>);
+        }
     }
     // Reset previous click location when there 
     else {
@@ -206,4 +234,5 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, InputLocks* locks, float del
 // Resets all locks on keys
 void InputLocks::ClearLocks() {
     lockCtrlS = false;
+    rerender = false;
 }

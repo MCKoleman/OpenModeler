@@ -13,8 +13,8 @@ int main()
 
     // Build and compile shader program
     // ------------------------------------
-    ProgramIDs* ids = new ProgramIDs();
-    ids->shaderProgram = LoadShaderProgram(options.phong == 1);
+    ProgramIDs ids = ProgramIDs();
+    ids.shaderProgram = LoadShaderProgram(options.phong == 1);
 
     // Create scene
     // ------------
@@ -52,7 +52,7 @@ int main()
     }
 
     // Init VAO, VBO, and EBO
-    OpenGLInitBuffers(ids, vertsSize, vertices, indicesSize, indices);
+    OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
 
     // Enable wireframe if requested in options
     if (options.wireframe == 1) {
@@ -62,9 +62,12 @@ int main()
     // Init variables to track user input. Speed constants declared in order:
     // CamMove, CamTurn, ModelMove, ModelTurn, ModelScale, MouseMove, MouseTurn
     SpeedConsts speeds = SpeedConsts(2.0f, 1.0f, 0.3f, 30.0f, 1.0f, 0.1f, 0.1f);
-    InputLocks* locks = new InputLocks();
+    InputLocks locks = InputLocks();
     int prevX = -1;
     int prevY = -1;
+
+    // Get selection
+    Selection sel = Selection();
 
     // Track time
     double lastTime = glfwGetTime();
@@ -81,8 +84,29 @@ int main()
         deltaTime = float(currentTime - lastTime);
 
         // Process input and render
-        ProcessInput(window, scene, locks, deltaTime, &speeds, &prevX, &prevY);
-        OpenGLDraw(scene, ids, indicesSize, indices);
+        ProcessInput(window, scene, &sel, &locks, deltaTime, &speeds, &prevX, &prevY);
+
+        // Update VAO on rerender call
+        if (locks.rerender) {
+            // Clear previous data
+            delete[] vertices;
+            delete[] indices;
+
+            // Set new data
+            vertsSize = displayMesh->GetVertCount() * 9;
+            indicesSize = displayMesh->GetIndexCount();
+            vertices = new float[vertsSize];
+            indices = new unsigned int[indicesSize];
+
+            scene->GetVAO(vertices, vertsSize, indices, indicesSize);
+            OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
+
+            // Reset rerender
+            locks.rerender = false;
+        }
+
+        // Render
+        OpenGLDraw(scene, &sel, &ids, indicesSize, indices);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -92,12 +116,10 @@ int main()
 
     // Clear up dynamic memory usage
     // -----------------------------
-    OpenGLCleanup(ids);
+    OpenGLCleanup(&ids);
     delete[] vertices;
     delete[] indices;
-    delete locks;
     delete scene;
-    delete ids;
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

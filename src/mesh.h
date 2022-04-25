@@ -1,5 +1,6 @@
 #pragma once
 #include "triangle.h"
+#include "face.h"
 #include <vector>
 #include <unordered_map>
 const float MIN_SCALE = 0.0000001f;
@@ -18,7 +19,7 @@ protected:
 
 	// Data
 	std::string name;
-	std::vector<Triangle> tris;
+	std::vector<Face> faces;
 	std::unordered_map<int, Vertex> verts;
 public:
 	Material defaultMat = Material();
@@ -59,31 +60,35 @@ public:
 	int GetVertCount();
 	// Returns the number of indexes in this mesh
 	int GetIndexCount();
-	// Gets the number of tris in the mesh
-	int GetTriCount();
 
 	// Adds the given triangle to the mesh
-	void AddTri(Triangle _tri);
+	void AddFace(Face _face);
 	// Adds the given vertex as the latest vertex of this mesh
 	int AddVert(Vertex _vert);
 	// Adds the given vertex to the given index
 	int AddVert(int _index, Vertex _vert);
-	// Sets the triangle at the given index to the given triangle
-	void SetTri(size_t index, Triangle _tri);
-	// Returns the tri at the given index
-	Triangle GetTri(size_t index);
+	// Returns the face at the given index
+	Face GetFace(size_t index);
+	// Returns the vert at the given index
+	Vertex GetVert(size_t index);
 
 	// Returns the name of the mesh
 	std::string GetName();
 	// Sets the name of the mesh
 	void SetName(std::string _name);
+	// Returns the faces of the mesh
+	std::vector<Face>& GetFaces();
 	// Returns the tris of the mesh
-	std::vector<Triangle>& GetTris();
+	std::vector<Triangle>& GetTris(std::vector<Triangle>& _tris);
+	// Returns all mats of the mesh for the given vertex
+	std::vector<std::string>& GetMatsForVert(std::vector<std::string>& _mats, int vertId);
 	// Returns the vertices of the mesh
 	std::unordered_map<int, Vertex>& GetVerts();
+	// Reorients all tris to have correct direction
+	void ReorientTris(std::vector<Triangle>& _tris);
 
-	// Clears the mesh of all tris
-	void ClearTris();
+	// Clears the mesh of all faces
+	void Clear();
 
 	// Vertex model of the mesh [0 for separate, 1 for indexed]
 	int GetVertexModel();

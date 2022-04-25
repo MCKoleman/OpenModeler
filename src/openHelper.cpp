@@ -80,13 +80,19 @@ void OpenGLInitBuffers(ProgramIDs* ids, int vertsSize, float* vertices, int indi
 
 // Draws the current scene
 // -----------------------
-void OpenGLDraw(Scene* scene, ProgramIDs* ids, int indicesSize, unsigned int* indices)
+void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, unsigned int* indices)
 {
     glClearColor(0.90f, 0.90f, 0.90f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Draw the object
     glUseProgram(ids->shaderProgram);
+
+    // TODO:
+    // Handle drawing the selection
+    //
+    std::vector<int> selectedVerts;
+    sel->GetSelectedVerts(selectedVerts, scene->GetCurMesh());
 
     // Apply MVP
     glm::mat4 model = GetModelMatrix(scene);
