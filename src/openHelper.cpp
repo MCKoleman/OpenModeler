@@ -105,6 +105,10 @@ void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, 
     glUniformMatrix4fv(ids->modelID, 1, GL_FALSE, &model[0][0]);
     glUniformMatrix3fv(ids->normalModelID, 1, GL_FALSE, &normalModel[0][0]);
 
+    // Send window scale
+    glm::vec2 winScale = glm::vec2(SCR_WIDTH, SCR_HEIGHT);
+    glUniform2fv(ids->winScaleID, 1, &winScale[0]);
+
     // Apply lighting
     glUniform1f(ids->ambientStrengthID, scene->GetLight()->ka);
     glUniform1f(ids->specularStrengthID, scene->GetLight()->ks);

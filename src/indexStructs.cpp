@@ -10,6 +10,7 @@ void ProgramIDs::GetUniformIDs()
     viewPosID = glGetUniformLocation(shaderProgram, "ViewPos");
     ambientStrengthID = glGetUniformLocation(shaderProgram, "AmbientStrength");
     specularStrengthID = glGetUniformLocation(shaderProgram, "SpecularStrength");
+    winScaleID = glGetUniformLocation(shaderProgram, "WIN_SCALE");
 }
 
 // Returns the index of the given vertex id in the vertex list
