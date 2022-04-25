@@ -1,8 +1,10 @@
 #pragma once
 #include "scene.h"
 #include "options.h"
+#include "pngWriter.h"
 #include "objWriter.h"
 #include "selection.h"
+#include "rayTracer.h"
 
 #define KEY1_PRESS (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
 #define KEY2_PRESS (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)

@@ -1,4 +1,5 @@
 #include "input.h"
+#include "openHelper.h"
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
@@ -180,6 +181,9 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
         if (!locks->lockCtrlR) {
             // TODO:
             // Handle render
+            Png pngResult = Png(SCR_WIDTH, SCR_HEIGHT);
+            RayTracer::RayTrace(scene, pngResult.img);
+            pngResult.WritePngToFile("../out/", "resultRender.png");
             locks->lockCtrlR = true;
         }
         didReceiveInput = true;

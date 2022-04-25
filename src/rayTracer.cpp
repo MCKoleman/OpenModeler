@@ -1,4 +1,5 @@
 #include "rayTracer.h"
+#include "openHelper.h"
 
 //Returns a view ray
 Ray RayTracer::generateRay(Camera* camera, float u, float v)
@@ -46,11 +47,15 @@ glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 	}
 }
 
+glm::vec3 RayTracer::normal(std::vector<glm::vec3>& vPos)
+{
+	return glm::vec3();
+}
+
 //Returns a pointer to an array that defines each pixel in the ray traced scene
-glm::vec3* RayTracer::RayTrace(Scene* scene)
+void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 {
 	Camera* camera = scene->GetCamera();
-	glm::vec3* image = new glm::vec3[SCR_WIDTH * SCR_HEIGHT];
 
 	for (int i = 0; i < SCR_HEIGHT; i++)
 	{
@@ -60,12 +65,7 @@ glm::vec3* RayTracer::RayTrace(Scene* scene)
 			float v = (i + 0.5f) / SCR_HEIGHT;
 
 			Ray viewRay = generateRay(scene->GetCamera(), u, v);
-
-			int index = i * SCR_WIDTH + j;
-
-			image[index] = getPixelColor(scene, viewRay, 0);
+			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 1.0f);
 		}
 	}
-
-	return image;
 }

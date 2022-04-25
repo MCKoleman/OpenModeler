@@ -19,4 +19,5 @@ Png::Png(unsigned int _width, unsigned int _height)
 {
     width = _width;
     height = _height;
+    img.resize(width * height);
 }

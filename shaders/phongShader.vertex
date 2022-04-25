@@ -6,9 +6,9 @@ layout (location = 3) in vec3 aColor;
 
 out VS
 {
-	vec3 VertColor;
-	vec3 FragPos;
-	vec3 Normal;
+	vec3 geoVertColor;
+	vec3 geoFragPos;
+	vec3 geoNormal;
 	float vertExcludeEdge;
 };
 
@@ -19,11 +19,11 @@ uniform mat3 NormalModel;
 void main()
 {
    gl_Position = MVP * vec4(aPos, 1.0);
-   VertColor = aColor;
-   Normal = NormalModel * aNorm;
+   geoVertColor = aColor;
+   geoNormal = NormalModel * aNorm;
    if (isSelected == 1.0)
       vertExcludeEdge = 0.0;
    else
       vertExcludeEdge = 1.0;
-   FragPos = vec3(Model * vec4(aPos, 1.0f));
+   geoFragPos = vec3(Model * vec4(aPos, 1.0f));
 }
