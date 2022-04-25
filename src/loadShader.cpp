@@ -130,8 +130,8 @@ unsigned int LoadShaderProgram(bool isPhong)
 {
     // Load phong shader
     if (isPhong)
-        return LoadShaders("../shaders/phongShader.vertex", "../shaders/geometryShader.geometry", "../shaders/phongShader.frag");
+        return LoadShaders("../shaders/phongShader.vertex", "../shaders/phongShader.geometry", "../shaders/phongShader.frag");
     // Load gouraud shader
     else
-        return LoadShaders("../shaders/gouraudShader.vertex", "../shaders/geometryShader.geometry", "../shaders/gouraudShader.frag");
+        return LoadShaders("../shaders/gouraudShader.vertex", "../shaders/gouraudShader.geometry", "../shaders/gouraudShader.frag");
 }
