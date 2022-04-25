@@ -7,7 +7,7 @@ void ITriangle::SetMat(std::string _mat)
 
 void ITriangle::CalcNormal()
 {
-	normal = glm::cross(vertices[1].pos - vertices[0].pos, vertices[2].pos - vertices[0].pos);
+	normal = glm::normalize(glm::cross(vertices[1].pos - vertices[0].pos, vertices[2].pos - vertices[0].pos));
 }
 
 ITriangle::ITriangle()

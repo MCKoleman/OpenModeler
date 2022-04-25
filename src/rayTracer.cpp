@@ -27,32 +27,24 @@ glm::vec3 RayTracer::bisector(glm::vec3 a, glm::vec3 b)
 	return (a + b) / length(a + b);
 }
 
-//Returns normal of triangle
-glm::vec3 RayTracer::normal(std::vector<glm::vec3>& vPos)
-{
-	glm::vec3 A = vPos[1] - vPos[0];
-	glm::vec3 B = vPos[2] - vPos[0];
-	return glm::normalize(glm::cross(A, B));
-}
-
 //Returns the t value of the given triangle with respect to the given ray
-float RayTracer::get_t(std::vector<glm::vec3>& vPos, Ray& r)
+float RayTracer::get_t(ITriangle& tri, Ray& r)
 {
-	return glm::dot((vPos[0] - r.origin), normal(vPos)) / glm::dot(r.direction, normal(vPos));
+	return glm::dot((tri.vertices[0].pos - r.origin), tri.normal) / glm::dot(r.direction, tri.normal);
 }
 
 //Returns true if the given ray intersects the given triangle
-bool RayTracer::intersectTriangle(std::vector<glm::vec3>& vPos, Ray& r)
+bool RayTracer::intersectTriangle(ITriangle& tri, Ray& r)
 {
-	float t = get_t(vPos, r);
+	float t = get_t(tri, r);
 	glm::vec3 x = r.origin + (t * r.direction);
 
 	if (t < 0)
 		return false;
 
-	float check1 = glm::dot(glm::cross((vPos[1] - vPos[0]), (x - vPos[0])), normal(vPos));
-	float check2 = glm::dot(glm::cross((vPos[2] - vPos[1]), (x - vPos[1])), normal(vPos));
-	float check3 = glm::dot(glm::cross((vPos[0] - vPos[2]), (x - vPos[2])), normal(vPos));
+	float check1 = glm::dot(glm::cross((tri.vertices[1].pos - tri.vertices[0].pos), (x - tri.vertices[0].pos)), tri.normal);
+	float check2 = glm::dot(glm::cross((tri.vertices[2].pos - tri.vertices[1].pos), (x - tri.vertices[1].pos)), tri.normal);
+	float check3 = glm::dot(glm::cross((tri.vertices[0].pos - tri.vertices[2].pos), (x - tri.vertices[2].pos)), tri.normal);
 
 	if (!(check1 > 0))
 		return false;
@@ -64,41 +56,26 @@ bool RayTracer::intersectTriangle(std::vector<glm::vec3>& vPos, Ray& r)
 	return true;
 }
 
-//Returns the key of the mesh and the triangle number within that mesh of the closest triangle to the screen
-Strint RayTracer::getClosestTriangle(std::unordered_map<std::string, Mesh*>& meshes, Ray& r)
+//Returns a pointer to the first triangle that the view ray intersects with
+ITriangle* RayTracer::getClosestTriangle(std::vector<ITriangle>& tris, Ray& r)
 {
 	float t = 100;
-	std::string meshKey = "NULL";
-	int triangleIndex = -1;
+	ITriangle* closestTri = nullptr;
 
-	for (auto iter = meshes.begin(); iter != meshes.end(); iter++) {
-		Mesh* mesh = iter->second;
-
-		auto verts = mesh->GetVerts();
-		std::vector<Triangle> tris;
-		mesh->GetTris(tris);
-
-		for (int i = 0; i < tris.size(); i++)
+	for (int i = 0; i < tris.size(); i++)
+	{
+		if (intersectTriangle(tris[i], r))
 		{
-			std::vector<glm::vec3> positions;
-			positions.push_back(verts.at(tris[i].vertices[0]).pos);
-			positions.push_back(verts.at(tris[i].vertices[1]).pos);
-			positions.push_back(verts.at(tris[i].vertices[2]).pos);
-
-			if (intersectTriangle(positions, r))
+			float t2 = get_t(tris[i], r);
+			if (t2 <= t)
 			{
-				float t2 = get_t(positions, r);
-				if (t2 <= t)
-				{
-					meshKey = iter->first;
-					triangleIndex = i;
-					t = t2;
-				}
+				*closestTri = tris[i];
+				t = t2;
 			}
 		}
 	}
 
-	return Strint(triangleIndex, meshKey);
+	return closestTri;
 }
 
 
@@ -106,29 +83,27 @@ Strint RayTracer::getClosestTriangle(std::unordered_map<std::string, Mesh*>& mes
 //Returns the color of the current pixel with the given ray
 glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 {
-	Strint foundTriangle = getClosestTriangle(scene->GetMeshes()->GetAll(), r);
+	std::vector<ITriangle> tris;
+	scene->GetTris(tris);
+
+	ITriangle* foundTriangle = getClosestTriangle(tris, r);
 	
-	if (foundTriangle.id == -1)
+	if (foundTriangle == nullptr)
 		return scene->bgColor;
 	else
 	{
-		Mesh* mesh = scene->GetMeshes()->Get(foundTriangle.str);
-		Triangle triangle = Triangle();//mesh->GetTri(foundTriangle.id);
-		Material* mat = scene->GetMats()->Get(triangle.mat);
+		Material* mat = scene->GetMats()->Get(foundTriangle->mat);
+		Light* light = scene->GetLight();
 
-		auto verts = mesh->GetVerts();
+		glm::vec3 p = r.origin + (get_t(*foundTriangle, r) * r.direction);
+		glm::vec3 n = foundTriangle->normal;
+		glm::vec3 h = glm::normalize(bisector(p, -light->dir));
 
-		std::vector<glm::vec3> positions;
-		positions.push_back(verts.at(triangle.vertices[0]).pos);
-		positions.push_back(verts.at(triangle.vertices[1]).pos);
-		positions.push_back(verts.at(triangle.vertices[2]).pos);
+		glm::vec3 ambient = mat->ka * light->ka;
+		glm::vec3 diffuse = mat->kd * glm::max(0.0f, glm::dot(n, glm::normalize(-light->dir)));
+		glm::vec3 specular = mat->ks * (float)glm::pow(glm::max(0.0f, glm::dot(n, h)), 50);
 
-		glm::vec3 p = r.origin + (get_t(positions, r) * r.direction);
-		glm::vec3 n = normal(positions);
-		glm::vec3 h = bisector(p, -scene->GetLight()->dir);
-
-		// TODO: Perform color calculation and return color
-		return glm::vec3();
+		return ambient + light->ks * (diffuse + specular);
 	}
 }
 
@@ -138,17 +113,12 @@ glm::vec3* RayTracer::RayTrace(Scene* scene)
 	Camera* camera = scene->GetCamera();
 	glm::vec3* image = new glm::vec3[SCR_WIDTH * SCR_HEIGHT];
 
-	float left = -1;
-	float right = 1;
-	float top = 1;
-	float bottom = -1;
-
 	for (int i = 0; i < SCR_HEIGHT; i++)
 	{
 		for (int j = 0; i < SCR_WIDTH; j++)
 		{
-			float u = left + (right - left) * (j + 0.5f) / SCR_WIDTH;
-			float v = bottom + (top - bottom) * (i + 0.5f) / SCR_HEIGHT;
+			float u = (j + 0.5) / SCR_WIDTH;
+			float v = (i + 0.5) / SCR_HEIGHT;
 
 			Ray viewRay = generateRay(scene->GetCamera(), u, v);
 
