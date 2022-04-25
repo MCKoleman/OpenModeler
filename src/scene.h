@@ -5,6 +5,7 @@
 #include "materialStorage.h"
 #include "meshStorage.h"
 #include "itriangle.h"
+#include "ray.h"
 
 class Scene
 {
@@ -13,25 +14,31 @@ private:
 	Camera* camera;
 	MaterialStorage* mats;
 	MeshStorage* meshes;
-	Mesh* curMesh;
+	std::unordered_map<int, Vertex> verts;
+	std::vector<Triangle> tris;
+	std::vector<ITriangle> renderTris;
 public:
 	glm::vec3 bgColor = glm::vec3(255, 87, 51);
 
 	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize);
-	void GetTris(std::vector<ITriangle>& outTris);
+	void CalcRenderTris();
+
+	std::unordered_map<int, Vertex>& GetVerts();
+	std::vector<Triangle>& GetTris();
+	std::vector<ITriangle>& GetRenderTris();
+	int GetVertCount();
+	int GetIndexCount();
 
 	Camera* GetCamera();
 	Light* GetLight();
 	MaterialStorage* GetMats();
 	MeshStorage* GetMeshes();
-	Mesh* GetCurMesh();
 
 	void SetCameraFromOptions(Options* options);
 	void SetCamera(Camera* _cam);
 	void SetLight(Light* _light);
 	void SetMats(MaterialStorage* _mats);
 	void SetMeshes(MeshStorage* _meshes);
-	void SetCurMesh(Mesh* _curMesh);
 
 	Scene();
 	~Scene();

@@ -23,8 +23,7 @@ glm::vec3 RayTracer::bisector(glm::vec3 a, glm::vec3 b)
 //Returns the color of the current pixel with the given ray
 glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 {
-	std::vector<ITriangle> tris;
-	scene->GetTris(tris);
+	std::vector<ITriangle> tris = scene->GetRenderTris();
 
 	ITriangle* foundTriangle = r.GetClosestTriangle(tris);
 	

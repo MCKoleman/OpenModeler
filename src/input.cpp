@@ -4,8 +4,9 @@
 // ---------------------------------------------------------------------------------------------------------
 bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* locks, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
 {
+    // TODO: Replace mesh reference with proper reference
     Camera* camera = scene->GetCamera();
-    Mesh* mesh = scene->GetCurMesh();
+    Mesh* mesh = scene->GetMeshes()->GetAll().begin()->second;
     bool didReceiveInput = false;
 
     // Get window width and height
@@ -35,7 +36,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
         // Save on Ctrl+S
         if (CTRL_PRESS) {
             if (!locks->lockCtrlS) {
-                WriteObjToFile(scene, "../models/", scene->GetCurMesh()->GetName());
+                WriteObjToFile(scene, "../models/", mesh->GetName());
                 locks->lockCtrlS = true;
             }
         }

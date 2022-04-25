@@ -30,7 +30,7 @@ int main()
 
     // Read mesh
     // ---------
-    Mesh* displayMesh = scene->GetCurMesh();
+    Mesh* displayMesh = scene->GetMeshes()->GetAll().begin()->second;
 
     // Read mesh from file
     ReadObjFromFile(displayMesh, scene->GetMats(), "../models/", options.objName);
@@ -39,9 +39,9 @@ int main()
 
     // Load up model into vertice and indice structures
     // Get vertices
-    int vertsSize = displayMesh->GetVertCount() * 9;
+    int vertsSize = scene->GetVertCount() * 9;
+    int indicesSize = scene->GetIndexCount();
     float* vertices = new float[vertsSize];
-    int indicesSize = displayMesh->GetIndexCount();
     unsigned int* indices = new unsigned int[indicesSize];
     scene->GetVAO(vertices, vertsSize, indices, indicesSize);
 
@@ -93,8 +93,8 @@ int main()
             delete[] indices;
 
             // Set new data
-            vertsSize = displayMesh->GetVertCount() * 9;
-            indicesSize = displayMesh->GetIndexCount();
+            vertsSize = scene->GetVertCount() * 9;
+            indicesSize = scene->GetIndexCount();
             vertices = new float[vertsSize];
             indices = new unsigned int[indicesSize];
 

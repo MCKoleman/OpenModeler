@@ -48,8 +48,20 @@ void Selection::ClearSelection()
 	selFaces.clear();
 }
 
+// Sets the tool selection
+void Selection::SetTool(Tool _sel)
+{
+	tool = _sel;
+}
+
+// Returns the tool selection
+Tool Selection::GetTool()
+{
+	return tool;
+}
+
 // Storage container for information on all selections
 Selection::Selection()
 {
-
+	tool = Tool::NONE;
 }

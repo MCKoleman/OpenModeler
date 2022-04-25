@@ -59,49 +59,23 @@ void Face::GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& 
 	}
 }
 
-#include <iostream>
 Triangle Face::GetClockwiseTri(IndVertex a, IndVertex b, IndVertex c, std::string _mat, int _sg)
 {
-	if(IsInside(center + normal * 0.001f))
-		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
+	//if(IsInside(center + normal * 0.001f))
+	//	return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
 	if (IsCCW(a.ver.pos, b.ver.pos, c.ver.pos)) {
-		std::cout << "Used triangulation method 1 (abc)" << std::endl;
+		//std::cout << "Used triangulation method 1 (abc)" << std::endl;
 		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
-	}
-	else if (IsCCW(a.ver.pos, c.ver.pos, b.ver.pos)) {
-		std::cout << "Used triangulation method 2 (acb)" << std::endl;
-		return Triangle(a.id, c.id, b.id, normal, center, _mat, _sg);
-	}
-	else if (IsCCW(b.ver.pos, a.ver.pos, c.ver.pos)) {
-		std::cout << "Used triangulation method 3 (bac)" << std::endl;
-		return Triangle(b.id, a.id, c.id, normal, center, _mat, _sg);
-	}
-	else if (IsCCW(b.ver.pos, c.ver.pos, a.ver.pos)) {
-		std::cout << "Used triangulation method 4 (bca)" << std::endl;
-		return Triangle(b.id, c.id, a.id, normal, center, _mat, _sg);
-	}
-	else if (IsCCW(c.ver.pos, a.ver.pos, b.ver.pos)) {
-		std::cout << "Used triangulation method 5 (cab)" << std::endl;
-		return Triangle(c.id, a.id, b.id, normal, center, _mat, _sg);
-	}
-	else if (IsCCW(c.ver.pos, b.ver.pos, a.ver.pos)) {
-		std::cout << "Used triangulation method 6 (cba)" << std::endl;
-		return Triangle(c.id, b.id, a.id, normal, center, _mat, _sg);
 	}
 	else {
-		std::cout << "Failed triangulation." << std::endl;
-		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
+		//std::cout << "Used triangulation method 2 (acb)" << std::endl;
+		return Triangle(a.id, c.id, b.id, normal, center, _mat, _sg);
 	}
 }
 
 bool IsCCW(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
 	return ((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)) > 0;
-}
-
-bool IsInside(glm::vec3 pos)
-{
-	return false;
 }
 
 int Face::GetNumVerts()

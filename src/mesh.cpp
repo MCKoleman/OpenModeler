@@ -144,7 +144,6 @@ std::vector<Triangle>& Mesh::GetTris(std::vector<Triangle>& _tris)
 	for (int i = 0; i < faces.size(); i++) {
 		faces[i].GetTri(_tris, verts);
 	}
-	ReorientTris(_tris);
 	return _tris;
 }
 
