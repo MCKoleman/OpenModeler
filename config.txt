@@ -1,5 +1,5 @@
 # Which object should be loaded by the program
-object = testCube
+object = cow
 
 # Scale of the object in the program
 scale = 0.6
@@ -17,7 +17,7 @@ vertexmodel = 1
 wireframe = 0
 
 # Should the model information be printed in the console? [0] No, [1] Yes
-print = 1
+print = 0
 
 # Should the model be rendered using Gouraud [0] or Phong [1] shading
 phong = 0

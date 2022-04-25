@@ -7,6 +7,8 @@
 
 struct Triangle;
 struct Face {
+	glm::vec3 normal;
+	glm::vec3 center;
 	std::string mat;
 	std::vector<int> vertices;
 	int shadingGroup = -1;
@@ -18,7 +20,11 @@ struct Face {
 	void SetVertices(std::vector<int>& _verts);
 
 	void SetMat(std::string _mat);
-	glm::vec3 CalcNormal(std::vector<int>& _verts);
+	void SetNormal(glm::vec3 _norm);
+	void SetCenter(glm::vec3 _center);
+	void CalcCenter(std::unordered_map<int, Vertex>& _verts);
+	void CalcNormal(std::unordered_map<int, Vertex>& _verts);
+	Triangle GetClockwiseTri(IndVertex a, IndVertex b, IndVertex c, std::string _mat, int _sg);
 	void Clear();
 
 	Face(std::string _mat = "default", int _sg = -1);
@@ -28,3 +34,6 @@ struct Face {
 	Face(std::vector<IndVertex>& _verts, std::string _mat = "default", int _sg = -1);
 	~Face();
 };
+
+bool IsCCW(glm::vec3 a, glm::vec3 b, glm::vec3 c);
+bool IsInside(glm::vec3 pos);

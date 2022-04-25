@@ -4,32 +4,31 @@
 // Adds the triangulated face to the given out parameter
 void Face::GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& tempVerts)
 {
+	CalcCenter(tempVerts);
+	CalcNormal(tempVerts);
+
 	// Handle edge cases
 	if (vertices.size() < 3) {
 		return;
 	}
 	// Handle triangles
 	else if (vertices.size() == 3) {
-		// Is abc a clockwise face?
-		if (IsClockwise(tempVerts[vertices[0]].pos, tempVerts[vertices[1]].pos, tempVerts[vertices[2]].pos)) {
-			tris.push_back(Triangle(vertices[0], vertices[1], vertices[2], mat, shadingGroup));
-		}
-		// If abc is ccw, then acb should be clockwise
-		else {
-			tris.push_back(Triangle(vertices[0], vertices[2], vertices[1], mat, shadingGroup));
-		}
+		tris.push_back(GetClockwiseTri(
+			IndVertex(vertices[0], tempVerts[vertices[0]]),
+			IndVertex(vertices[1], tempVerts[vertices[1]]),
+			IndVertex(vertices[2], tempVerts[vertices[2]]), mat, shadingGroup));
 	}
 	// Handle quads
 	else if (vertices.size() == 4) {
 		float dist1 = glm::distance(tempVerts[vertices[0]].pos, tempVerts[vertices[2]].pos);
 		float dist2 = glm::distance(tempVerts[vertices[1]].pos, tempVerts[vertices[3]].pos);
 		if (dist1 > dist2) {
-			tris.push_back(Triangle(vertices[0], vertices[1], vertices[3], mat, shadingGroup));
-			tris.push_back(Triangle(vertices[1], vertices[2], vertices[3], mat, shadingGroup));
+			tris.push_back(Triangle(vertices[0], vertices[1], vertices[3], normal, center, mat, shadingGroup));
+			tris.push_back(Triangle(vertices[1], vertices[2], vertices[3], normal, center, mat, shadingGroup));
 		}
 		else {
-			tris.push_back(Triangle(vertices[0], vertices[1], vertices[2], mat, shadingGroup));
-			tris.push_back(Triangle(vertices[0], vertices[2], vertices[3], mat, shadingGroup));
+			tris.push_back(Triangle(vertices[0], vertices[1], vertices[2], normal, center, mat, shadingGroup));
+			tris.push_back(Triangle(vertices[0], vertices[2], vertices[3], normal, center, mat, shadingGroup));
 		}
 	}
 	// Handle ngons
@@ -40,28 +39,69 @@ void Face::GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& 
 				float dist2 = glm::distance(tempVerts[vertices[i + 1]].pos, tempVerts[vertices[i + 3]].pos);
 
 				if (dist1 > dist2) {
-					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 3], mat, shadingGroup));
-					tris.push_back(Triangle(vertices[i + 1], vertices[i + 2], vertices[i + 3], mat, shadingGroup));
+					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 3], normal, center, mat, shadingGroup));
+					tris.push_back(Triangle(vertices[i + 1], vertices[i + 2], vertices[i + 3], normal, center, mat, shadingGroup));
 				}
 				else {
-					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 2], mat, shadingGroup));
-					tris.push_back(Triangle(vertices[i], vertices[i + 2], vertices[i + 3], mat, shadingGroup));
+					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 2], normal, center, mat, shadingGroup));
+					tris.push_back(Triangle(vertices[i], vertices[i + 2], vertices[i + 3], normal, center, mat, shadingGroup));
 				}
 				// If two tris were handled at once, skip the next one
 				i++;
 			}
 			else {
-				// Is abc a clockwise face?
-				if (IsClockwise(tempVerts[vertices[i]].pos, tempVerts[vertices[i + 1]].pos, tempVerts[vertices[i + 2]].pos)) {
-					tris.push_back(Triangle(vertices[i], vertices[i + 1], vertices[i + 2], mat, shadingGroup));
-				}
-				// If abc is ccw, then acb should be clockwise
-				else {
-					tris.push_back(Triangle(vertices[i], vertices[i + 2], vertices[i + 1], mat, shadingGroup));
-				}
+				tris.push_back(GetClockwiseTri(
+					IndVertex(vertices[i], tempVerts[vertices[i]]), 
+					IndVertex(vertices[i+1], tempVerts[vertices[i+1]]), 
+					IndVertex(vertices[i+2], tempVerts[vertices[i+2]]), mat, shadingGroup));
 			}
 		}
 	}
+}
+
+#include <iostream>
+Triangle Face::GetClockwiseTri(IndVertex a, IndVertex b, IndVertex c, std::string _mat, int _sg)
+{
+	if(IsInside(center + normal * 0.001f))
+		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
+	if (IsCCW(a.ver.pos, b.ver.pos, c.ver.pos)) {
+		std::cout << "Used triangulation method 1 (abc)" << std::endl;
+		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
+	}
+	else if (IsCCW(a.ver.pos, c.ver.pos, b.ver.pos)) {
+		std::cout << "Used triangulation method 2 (acb)" << std::endl;
+		return Triangle(a.id, c.id, b.id, normal, center, _mat, _sg);
+	}
+	else if (IsCCW(b.ver.pos, a.ver.pos, c.ver.pos)) {
+		std::cout << "Used triangulation method 3 (bac)" << std::endl;
+		return Triangle(b.id, a.id, c.id, normal, center, _mat, _sg);
+	}
+	else if (IsCCW(b.ver.pos, c.ver.pos, a.ver.pos)) {
+		std::cout << "Used triangulation method 4 (bca)" << std::endl;
+		return Triangle(b.id, c.id, a.id, normal, center, _mat, _sg);
+	}
+	else if (IsCCW(c.ver.pos, a.ver.pos, b.ver.pos)) {
+		std::cout << "Used triangulation method 5 (cab)" << std::endl;
+		return Triangle(c.id, a.id, b.id, normal, center, _mat, _sg);
+	}
+	else if (IsCCW(c.ver.pos, b.ver.pos, a.ver.pos)) {
+		std::cout << "Used triangulation method 6 (cba)" << std::endl;
+		return Triangle(c.id, b.id, a.id, normal, center, _mat, _sg);
+	}
+	else {
+		std::cout << "Failed triangulation." << std::endl;
+		return Triangle(a.id, b.id, c.id, normal, center, _mat, _sg);
+	}
+}
+
+bool IsCCW(glm::vec3 a, glm::vec3 b, glm::vec3 c)
+{
+	return ((b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y)) > 0;
+}
+
+bool IsInside(glm::vec3 pos)
+{
+
 }
 
 int Face::GetNumVerts()
@@ -106,9 +146,31 @@ void Face::SetMat(std::string _mat)
 	mat = _mat;
 }
 
-glm::vec3 Face::CalcNormal(std::vector<int>& _verts)
+void Face::SetCenter(glm::vec3 _center)
 {
-	return glm::vec3();
+	center = _center;
+}
+
+void Face::SetNormal(glm::vec3 _norm)
+{
+	normal = _norm;
+}
+
+void Face::CalcCenter(std::unordered_map<int, Vertex>& _verts)
+{
+	center = (_verts[vertices[2]].pos + _verts[vertices[1]].pos + _verts[vertices[0]].pos) / 3.0f;
+}
+
+void Face::CalcNormal(std::unordered_map<int, Vertex>& _verts)
+{
+	normal = glm::vec3(0, 0, 0);
+	for (int i = 0; i < vertices.size(); i++) {
+		glm::vec3 cur = _verts[vertices[i]].pos;
+		glm::vec3 next = _verts[vertices[(i + 1) % vertices.size()]].pos;
+
+		normal += glm::vec3((cur.y - next.y) * (cur.z + next.z), (cur.z - next.z) * (cur.x + next.x), (cur.x - next.x) * (cur.y + next.y));
+	}
+	normal = glm::normalize(normal);
 }
 
 void Face::Clear()

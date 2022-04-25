@@ -105,7 +105,13 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
     }
     // Scale down
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-        mesh->SetScale(mesh->GetScale() - glm::vec3(speeds->modelScaleRate * deltaTime) * mesh->GetScale());
+        // Extrude on Ctrl+E
+        if (CTRL_PRESS) {
+            locks->rerender = true;
+        }
+        else {
+            mesh->SetScale(mesh->GetScale() - glm::vec3(speeds->modelScaleRate * deltaTime) * mesh->GetScale());
+        }
         didReceiveInput = true;
     }
 
@@ -228,4 +234,5 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
 // Resets all locks on keys
 void InputLocks::ClearLocks() {
     lockCtrlS = false;
+    rerender = false;
 }

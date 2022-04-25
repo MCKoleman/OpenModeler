@@ -144,6 +144,7 @@ std::vector<Triangle>& Mesh::GetTris(std::vector<Triangle>& _tris)
 	for (int i = 0; i < faces.size(); i++) {
 		faces[i].GetTri(_tris, verts);
 	}
+	ReorientTris(_tris);
 	return _tris;
 }
 
@@ -158,6 +159,19 @@ std::vector<std::string>& Mesh::GetMatsForVert(std::vector<std::string>& _mats, 
 		}
 	}
 	return _mats;
+}
+
+#include <iostream>
+void Mesh::ReorientTris(std::vector<Triangle>& _tris)
+{
+	for (int i = 0; i < _tris.size(); i++) {
+		if (glm::dot(_tris[i].normal, _tris[i].center) < 0.0f) {
+			std::cout << "Reoriented triangle [" << i << 
+				"] Normal: [" << _tris[i].normal.x << ", " << _tris[i].normal.y << ", " << _tris[i].normal.z <<
+				"], Center: [" << _tris[i].center.x << ", " << _tris[i].center.y << ", " << _tris[i].center.z << "]" << std::endl;
+			_tris[i] = Triangle(_tris[i].vertices[0], _tris[i].vertices[2], _tris[i].vertices[1], -_tris[i].normal, _tris[i].center, _tris[i].mat, _tris[i].shadingGroup);
+		}
+	}
 }
 
 std::unordered_map<int, Vertex>& Mesh::GetVerts()
@@ -194,6 +208,8 @@ void Mesh::RecalculateNormals()
 		for (int j = 0; j < faces[i].GetNumVerts(); j++) {
 			verts[faces[i].vertices[j]].normal = glm::normalize(verts[faces[i].vertices[j]].normal);
 		}
+		// Calculate face normal
+		faces[i].CalcNormal(verts);
 	}
 }
 

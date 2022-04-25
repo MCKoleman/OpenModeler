@@ -14,6 +14,7 @@
 // Input lock structure to separate presses from holding keyes
 struct InputLocks {
 	bool lockCtrlS = false;
+	bool rerender = false;
 
 	void ClearLocks();
 };

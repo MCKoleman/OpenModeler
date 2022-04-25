@@ -84,6 +84,8 @@ public:
 	std::vector<std::string>& GetMatsForVert(std::vector<std::string>& _mats, int vertId);
 	// Returns the vertices of the mesh
 	std::unordered_map<int, Vertex>& GetVerts();
+	// Reorients all tris to have correct direction
+	void ReorientTris(std::vector<Triangle>& _tris);
 
 	// Clears the mesh of all faces
 	void Clear();

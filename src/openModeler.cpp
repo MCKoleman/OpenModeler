@@ -85,6 +85,27 @@ int main()
 
         // Process input and render
         ProcessInput(window, scene, &sel, &locks, deltaTime, &speeds, &prevX, &prevY);
+
+        // Update VAO on rerender call
+        if (locks.rerender) {
+            // Clear previous data
+            delete[] vertices;
+            delete[] indices;
+
+            // Set new data
+            vertsSize = displayMesh->GetVertCount() * 9;
+            indicesSize = displayMesh->GetIndexCount();
+            vertices = new float[vertsSize];
+            indices = new unsigned int[indicesSize];
+
+            scene->GetVAO(vertices, vertsSize, indices, indicesSize);
+            OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
+
+            // Reset rerender
+            locks.rerender = false;
+        }
+
+        // Render
         OpenGLDraw(scene, &sel, &ids, indicesSize, indices);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
