@@ -33,7 +33,7 @@ std::string ReadShaderFromFile(std::string fileName)
 
 // Loads shaders for the program from files and returns the shader program ID
 // --------------------------------------------------------------------------
-unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
+unsigned int LoadShaders(std::string vertexFile, std::string geometryFile, std::string fragmentFile)
 {
     // vertex shader
     // -------------
@@ -58,6 +58,28 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
     }
     // --------------------
     // End of vertex shader
+
+    // geometry shader
+    // ---------------
+    unsigned int geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+
+    // Load fragment shader from source.fs
+    std::string tempGeomShader = ReadShaderFromFile(geometryFile);
+    const char* geometryShaderFile = tempGeomShader.c_str();
+
+    glShaderSource(geometryShader, 1, &geometryShaderFile, NULL);
+    glCompileShader(geometryShader);
+
+    // check for shader compile errors
+    glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(geometryShader, 512, NULL, infoLog);
+        std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+        return 0;
+    }
+    // ----------------------
+    // End of geometry shader
 
     // fragment shader
     // ---------------
@@ -85,6 +107,7 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
     // ------------
     unsigned int shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, geometryShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
     // check for linking errors
@@ -95,6 +118,7 @@ unsigned int LoadShaders(std::string vertexFile, std::string fragmentFile)
         return 0;
     }
     glDeleteShader(vertexShader);
+    glDeleteShader(geometryShader);
     glDeleteShader(fragmentShader);
     // ----------------------
     // End of linking shaders
