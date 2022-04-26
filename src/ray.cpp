@@ -39,7 +39,7 @@ bool Ray::IntersectTriangle(ITriangle& tri)
 //Returns a pointer to the first triangle that the view ray intersects with
 ITriangle Ray::GetClosestTriangle(std::vector<ITriangle>& tris)
 {
-	float t = 100.0f;
+	float t = 10000.0f;
 	ITriangle closestTri = ITriangle();
 
 	for (int i = 0; i < tris.size(); i++)
