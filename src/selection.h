@@ -6,6 +6,7 @@
 enum class Tool { NONE = 0, SELECT = 1, MOVE = 2, ROTATE = 3, SCALE = 4, EXTRUDE = 5 };
 enum class SelMode { MESH = 0, VERT = 1, FACE = 2 };
 
+class Scene;
 struct Selection {
 private:
 	glm::vec3 pivot;
@@ -42,6 +43,8 @@ public:
 	void ClearSelection();
 	// Sets the selection pivot
 	void SetSelectionPivot(glm::vec3 _pivot);
+	// Returns the selection pivot
+	glm::vec3 GetSelectionPivot();
 	// Calculates the selection pivot
 	void CalcSelPivot();
 	// Sets the tool selection
@@ -54,7 +57,18 @@ public:
 	SelMode GetSelMode();
 	// Returns the selected mesh
 	Mesh* GetSelectedMesh();
+	// Returns whether the given vertex is selected
+	bool IsVertSelected(int _id);
+	// Returns whether the given face is selected
+	bool IsFaceSelected(int _id);
 
 	// Storage container for information on all selections
 	Selection();
+
+	// Returns the nearest mesh to the clicked position
+	static Mesh* GetNearestMesh(Scene* scene, int i, int j);
+	// Returns the nearest vertex to the clicked position
+	static int GetNearestVert(Scene* scene, int i, int j);
+	// Returns the nearest face to the clicked position
+	static int GetNearestFace(Scene* scene, int i, int j);
 };

@@ -1,4 +1,7 @@
 #include "selection.h"
+#include "rayTracer.h"
+#include "scene.h"
+#include <iostream>
 
 // Returns the entire selection as a selection of vertices
 void Selection::GetSelectedVerts(std::vector<int>& _verts)
@@ -35,17 +38,17 @@ void Selection::GetSelectedVerts(std::set<int>& _verts)
 }
 
 // Selects the face with the given ID
-void Selection::SelectFace(int _id) { selFaces.emplace(_id); }
+void Selection::SelectFace(int _id) { selFaces.emplace(_id); std::cout << "Selected face [" << _id << "].\n"; }
 // Selects the vertex with the given ID
-void Selection::SelectVert(int _id) { selVerts.emplace(_id); }
+void Selection::SelectVert(int _id) { selVerts.emplace(_id); std::cout << "Selected vertex [" << _id << "].\n"; }
 // Selects the given mesh
-void Selection::SelectMesh(Mesh* mesh) { selMesh = mesh; }
+void Selection::SelectMesh(Mesh* mesh) { selMesh = mesh; std::cout << "Selected mesh [" << selMesh << "].\n"; }
 // Deselects the face with the given ID
-void Selection::DeselectFace(int _id) { selFaces.erase(_id); }
+void Selection::DeselectFace(int _id) { selFaces.erase(_id); std::cout << "Deselected face [" << _id << "].\n"; }
 // Deselects the vertex with the given ID
-void Selection::DeselectVert(int _id) { selVerts.erase(_id); }
+void Selection::DeselectVert(int _id) { selVerts.erase(_id); std::cout << "Deselected vertex [" << _id << "].\n"; }
 // Deselects the currently selected mesh
-void Selection::DeselectMesh() { selMesh = nullptr; }
+void Selection::DeselectMesh() { selMesh = nullptr; std::cout << "Deselected mesh.\n"; }
 
 // Clears the vertex selection
 void Selection::ClearVertSel() { selVerts.clear(); }
@@ -56,6 +59,8 @@ void Selection::ClearSelection() { ClearFaceSel(); ClearVertSel(); }
 
 // Sets the selection pivot
 void Selection::SetSelectionPivot(glm::vec3 _pivot) { pivot = _pivot; }
+// Returns the selection pivot
+glm::vec3 Selection::GetSelectionPivot() { return pivot; }
 
 // Calculates the selection pivot
 void Selection::CalcSelPivot()
@@ -84,7 +89,6 @@ void Selection::CalcSelPivot()
 	}
 }
 
-#include <iostream>
 // Sets the tool selection
 void Selection::SetTool(Tool _sel)
 {
@@ -114,7 +118,23 @@ void Selection::SetTool(Tool _sel)
 void Selection::SetSelMode(SelMode _sel)
 {
 	selMode = _sel;
+	switch (selMode) {
+	case SelMode::MESH:
+		std::cout << "Selected mode [MESH]\n";
+		break;
+	case SelMode::FACE:
+		std::cout << "Selected mode [FACE]\n";
+		break;
+	case SelMode::VERT:
+		std::cout << "Selected mode [VERT]\n";
+		break;
+	}
 }
+
+// Returns whether the given vertex is selected
+bool Selection::IsVertSelected(int _id) { return selVerts.find(_id) != selVerts.end(); }
+// Returns whether the given face is selected
+bool Selection::IsFaceSelected(int _id) { return selFaces.find(_id) != selFaces.end(); }
 
 // Returns the tool selection
 Tool Selection::GetTool() { return tool; }
@@ -130,4 +150,22 @@ Selection::Selection()
 	selMode = SelMode::MESH;
 	pivot = glm::vec3(0, 0, 0);
 	selMesh = nullptr;
+}
+
+// Returns the nearest mesh to the clicked position
+Mesh* Selection::GetNearestMesh(Scene* scene, int i, int j)
+{
+	return nullptr;
+}
+
+// Returns the nearest vertex to the clicked position
+int Selection::GetNearestVert(Scene* scene, int i, int j)
+{
+	return -1;
+}
+
+// Returns the nearest face to the clicked position
+int Selection::GetNearestFace(Scene* scene, int i, int j)
+{
+	return -1;
 }
