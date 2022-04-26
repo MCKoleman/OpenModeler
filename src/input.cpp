@@ -3,7 +3,7 @@
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* locks, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY)
+bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* locks, Options* options, SpeedConsts* speeds, float deltaTime, int* prevX, int* prevY)
 {
     // TODO: Replace mesh reference with proper reference
     Camera* camera = scene->GetCamera();
@@ -37,6 +37,16 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
             camera->CalcBasis();
 
             locks->lockF = true;
+        }
+        didReceiveInput = true;
+    }
+    // Toggle wireframe
+    if (KEY5_PRESS && !CTRL_PRESS) {
+        if (!locks->lockKey5) {
+            options->wireframe = (options->wireframe == 1 ? 0 : 1);
+            OpenGLEnableWireframe(options->wireframe == 1);
+            std::cout << "Turned wireframe " << (options->wireframe == 1 ? "on" : "off") << "\n";
+            locks->lockKey5 = true;
         }
         didReceiveInput = true;
     }
@@ -394,6 +404,7 @@ void InputLocks::ClearLocks() {
     lockCtrlT = false;		// Triangulate
     lockCtrlS = false;		// Save
     lockDel = false;        // Delete
+    lockKey5 = false;
 
     rerender = false;
 }

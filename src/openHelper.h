@@ -12,6 +12,7 @@ GLFWwindow* OpenGLInitWindow(int width, int height, std::string name);
 void OpenGLInitBuffers(ProgramIDs* ids, int vertsSize, float* vertices, int indicesSize, unsigned int* indices);
 void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, unsigned int* indices);
 void OpenGLCleanup(ProgramIDs* ids);
+void OpenGLEnableWireframe(bool enable);
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 glm::mat4 CalcMVP(Scene* scene);

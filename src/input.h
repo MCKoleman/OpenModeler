@@ -47,6 +47,12 @@ struct InputLocks {
 	bool lockLeftMouse = false;
 	bool lockRightMouse = false;
 
+	bool lockKey1 = false;
+	bool lockKey2 = false;
+	bool lockKey3 = false;
+	bool lockKey4 = false;
+	bool lockKey5 = false;
+
 	bool reselect = false;
 	bool rerender = false;
 
@@ -54,6 +60,6 @@ struct InputLocks {
 	void LockTool(Tool _tool);
 };
 
-bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* locks, float deltaTime, SpeedConsts* speeds, int* prevX, int* prevY);
+bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* locks, Options* options, SpeedConsts* speeds, float deltaTime, int* prevX, int* prevY);
 glm::vec3 GetWASDZX(GLFWwindow* window);
 glm::vec3 GetArrow(GLFWwindow* window);

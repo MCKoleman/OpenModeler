@@ -57,9 +57,7 @@ int main()
     OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
 
     // Enable wireframe if requested in options
-    if (options.wireframe == 1) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
+    OpenGLEnableWireframe(options.wireframe == 1);
 
     // Init variables to track user input. Speed constants declared in order:
     // CamMove, CamTurn, ModelMove, ModelTurn, ModelScale, MouseMove, MouseTurn
@@ -86,7 +84,7 @@ int main()
         deltaTime = float(currentTime - lastTime);
 
         // Process input and render
-        ProcessInput(window, scene, &sel, &locks, deltaTime, &speeds, &prevX, &prevY);
+        ProcessInput(window, scene, &sel, &locks, &options, &speeds, deltaTime, &prevX, &prevY);
 
         // Process changes in selections
         if (sel.newSelVerts.size() != 0 || sel.removedSelVerts.size() != 0) {

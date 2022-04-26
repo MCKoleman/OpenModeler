@@ -71,14 +71,6 @@ void OpenGLInitBuffers(ProgramIDs* ids, int vertsSize, float* vertices, int indi
     ids->GetUniformIDs();
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Enable culling
-    glEnable(GL_CULL_FACE);
-
-    // Enable depth buffer
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
 }
 
 // Draws the current scene
@@ -126,6 +118,27 @@ void OpenGLCleanup(ProgramIDs* ids)
     glDeleteBuffers(1, &ids->VBO);
     glDeleteBuffers(1, &ids->EBO);
     glDeleteProgram(ids->shaderProgram);
+}
+
+// Enable or disable wireframe
+// ------------------------------------------
+void OpenGLEnableWireframe(bool enable)
+{
+    if (enable) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // Disable culling
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+    }
+    else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        // Enable culling
+        glEnable(GL_CULL_FACE);
+
+        // Enable depth buffer
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+    }
 }
 
 // Calculates the model view perspective matrix
