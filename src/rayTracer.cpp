@@ -6,7 +6,7 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 {
 	Camera* camera = scene->GetCamera();
 
-	glm::mat4 inverseVP = glm::inverse(GetProjectionMatrix(scene) * GetViewMatrix(scene));
+	glm::mat4 inverseVP = scene->GetInvMVP();
 
 	glm::vec3 eyePos = inverseVP * glm::vec4(camera->pos, 1.0f);
 	glm::vec3 lookAt = inverseVP * glm::vec4(camera->dir, 1.0f);
@@ -70,6 +70,7 @@ glm::vec3 RayTracer::normal(std::vector<glm::vec3>& vPos)
 void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 {
 	std::cout << "Started rendering scene\n";
+	scene->CalcMVP();
 
 	for (int i = 0; i < SCR_HEIGHT; i++)
 	{

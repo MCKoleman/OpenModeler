@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "openHelper.h"
 
 void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel)
 {
@@ -63,6 +64,16 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 		}
 	}
 	//std::cout << "Highest element written to indices: " << tempHighIndex << std::endl;
+}
+
+glm::mat4 Scene::GetInvMVP()
+{
+	return invMVP;
+}
+
+void Scene::CalcMVP()
+{
+	invMVP = glm::inverse(GetProjectionMatrix(this)) * glm::inverse(GetViewMatrix(this)) * glm::inverse(GetModelMatrix(this));
 }
 
 void Scene::CalcRenderTris()

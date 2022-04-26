@@ -18,8 +18,11 @@ private:
 	std::unordered_map<int, Vertex> verts;
 	std::vector<Triangle> tris;
 	std::vector<ITriangle> renderTris;
+	glm::mat4 invMVP;
 public:
 	glm::vec3 bgColor = glm::vec3(230, 230, 230);
+	glm::mat4 GetInvMVP();
+	void CalcMVP();
 
 	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel = nullptr);
 	void CalcRenderTris();
