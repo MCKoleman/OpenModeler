@@ -7,7 +7,7 @@
 class RayTracer
 {
 public:
-	static Ray generateRay(Camera* camera, float u, float v);
+	static Ray generateRay(Scene* scene, float u, float v);
 	static glm::vec3 bisector(glm::vec3 a, glm::vec3 b);
 	static glm::vec3 normal(std::vector<glm::vec3>& vPos);
 	static glm::vec3 getPixelColor(Scene* scene, Ray& r, int count);
