@@ -68,6 +68,8 @@ int main()
 
     // Get selection
     Selection sel = Selection();
+    sel.SetSelMode(SelMode::MESH);
+    sel.SetTool(Tool::SELECT);
 
     // Track time
     double lastTime = glfwGetTime();

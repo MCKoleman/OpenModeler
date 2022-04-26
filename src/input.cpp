@@ -144,11 +144,17 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
             case Tool::SCALE:
                 switch (sel->GetSelMode()) {
                 case SelMode::MESH:
-                    mesh->SetScale(mesh->GetScale() + speeds->modelScaleRate * deltaTime * mesh->GetScale());
+                    if(SHIFT_PRESS)
+                        mesh->SetScale(mesh->GetScale() + glm::clamp(inputVec.x + inputVec.y + inputVec.z, -1.0f, 1.0f) * speeds->modelScaleRate * deltaTime * mesh->GetScale());
+                    else
+                        mesh->SetScale(mesh->GetScale() + inputVec * speeds->modelScaleRate * deltaTime * mesh->GetScale());
                     break;
                 case SelMode::FACE:
                 case SelMode::VERT:
-                    mesh->Scale(selVerts, inputVec * speeds->modelScaleRate * deltaTime, sel->GetSelectionPivot());
+                    if (SHIFT_PRESS)
+                        mesh->Scale(selVerts, glm::vec3(glm::clamp(inputVec.x + inputVec.y + inputVec.z, -1.0f, 1.0f) * speeds->modelScaleRate * deltaTime), sel->GetSelectionPivot());
+                    else
+                        mesh->Scale(selVerts, inputVec * speeds->modelScaleRate * deltaTime, sel->GetSelectionPivot());
                     locks->rerender = true;
                     break;
                 default:
