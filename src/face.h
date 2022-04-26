@@ -13,7 +13,7 @@ struct Face {
 	std::vector<int> vertices;
 	int shadingGroup = -1;
 	
-	void GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& tempVerts);
+	void GetTri(std::vector<Triangle>& tris, std::unordered_map<int, Vertex>& tempVerts, int _index);
 	int GetNumVerts();
 	int GetVertex(int _index);
 	void SetVertex(int _vertex, int _index);
@@ -24,7 +24,7 @@ struct Face {
 	void SetCenter(glm::vec3 _center);
 	void CalcCenter(std::unordered_map<int, Vertex>& _verts);
 	void CalcNormal(std::unordered_map<int, Vertex>& _verts);
-	Triangle GetClockwiseTri(IndVertex a, IndVertex b, IndVertex c, std::string _mat, int _sg);
+	Triangle GetClockwiseTri(IndVertex a, IndVertex b, IndVertex c, std::string _mat, int _sg, int _index);
 	void Clear();
 
 	Face(std::string _mat = "default", int _sg = -1);

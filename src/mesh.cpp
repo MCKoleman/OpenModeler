@@ -119,7 +119,7 @@ std::vector<Triangle>& Mesh::GetTris(std::vector<Triangle>& _tris)
 {
 	// Convert all stored faces into tris
 	for (int i = 0; i < faces.size(); i++) {
-		faces[i].GetTri(_tris, verts);
+		faces[i].GetTri(_tris, verts, i);
 	}
 	return _tris;
 }

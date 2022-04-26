@@ -87,6 +87,22 @@ int main()
         // Process input and render
         ProcessInput(window, scene, &sel, &locks, deltaTime, &speeds, &prevX, &prevY);
 
+        // Process changes in selections
+        if (sel.newSelVerts.size() != 0 || sel.removedSelVerts.size() != 0) {
+            std::cout << "Selecting [" << sel.newSelVerts.size() << "] new verts, removing [" << sel.removedSelVerts.size() << "]\n";
+
+            for (auto iter = sel.newSelVerts.begin(); iter != sel.newSelVerts.end(); ++iter) {
+                vertices[*iter * VERT_SHADER_SIZE] = 1.0f;
+            }
+            for (auto iter = sel.removedSelVerts.begin(); iter != sel.removedSelVerts.end(); ++iter) {
+                vertices[*iter * VERT_SHADER_SIZE] = 0.0f;
+            }
+            sel.newSelVerts.clear();
+            sel.removedSelVerts.clear();
+            glBindBuffer(GL_ARRAY_BUFFER, ids.VBO);
+            glBufferData(GL_ARRAY_BUFFER, vertsSize * sizeof(vertices[0]), vertices, GL_STATIC_DRAW);
+        }
+
         // Update VAO on rerender call
         if (locks.rerender) {
             // Clear previous data

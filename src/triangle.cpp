@@ -25,8 +25,9 @@ Triangle::Triangle(int i0, int i1, int i2, std::string _mat, int _sg)
 	shadingGroup = _sg;
 }
 
-Triangle::Triangle(int i0, int i1, int i2, glm::vec3 _norm, glm::vec3 _center, std::string _mat, int _sg, TriTag _tag)
+Triangle::Triangle(int i0, int i1, int i2, glm::vec3 _norm, glm::vec3 _center, std::string _mat, int _sg, int _triIndex, TriTag _tag)
 {
+	triIndex = _triIndex;
 	tag = _tag;
 	normal = _norm;
 	center = _center;

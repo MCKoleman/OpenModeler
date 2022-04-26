@@ -1,6 +1,8 @@
 #include "selection.h"
 #include "rayTracer.h"
 #include "scene.h"
+#include "openHelper.h"
+#include "indexStructs.h"
 #include <iostream>
 
 // Returns the entire selection as a selection of vertices
@@ -38,17 +40,58 @@ void Selection::GetSelectedVerts(std::set<int>& _verts)
 }
 
 // Selects the face with the given ID
-void Selection::SelectFace(int _id) { selFaces.emplace(_id); std::cout << "Selected face [" << _id << "].\n"; }
+void Selection::SelectFace(int _id) 
+{
+	if (_id < 0)
+		return;
+
+	selFaces.emplace(_id); 
+	std::cout << "Selected face [" << _id << "].\n"; 
+}
+
 // Selects the vertex with the given ID
-void Selection::SelectVert(int _id) { selVerts.emplace(_id); std::cout << "Selected vertex [" << _id << "].\n"; }
+void Selection::SelectVert(int _id) 
+{ 
+	if (_id < 0)
+		return;
+
+	selVerts.emplace(_id); 
+	std::cout << "Selected vertex [" << _id << "].\n"; 
+}
+
 // Selects the given mesh
-void Selection::SelectMesh(Mesh* mesh) { selMesh = mesh; std::cout << "Selected mesh [" << selMesh << "].\n"; }
+void Selection::SelectMesh(Mesh* mesh) 
+{
+	if (mesh == nullptr)
+		return;
+
+	selMesh = mesh; 
+	std::cout << "Selected mesh [" << selMesh << "].\n"; 
+}
+
 // Deselects the face with the given ID
-void Selection::DeselectFace(int _id) { selFaces.erase(_id); std::cout << "Deselected face [" << _id << "].\n"; }
+void Selection::DeselectFace(int _id) 
+{ 
+	selFaces.erase(_id); 
+	std::cout << "Deselected face [" << _id << "].\n"; 
+}
+
 // Deselects the vertex with the given ID
-void Selection::DeselectVert(int _id) { selVerts.erase(_id); std::cout << "Deselected vertex [" << _id << "].\n"; }
+void Selection::DeselectVert(int _id) 
+{ 
+	selVerts.erase(_id); 
+	std::cout << "Deselected vertex [" << _id << "].\n"; 
+}
+
 // Deselects the currently selected mesh
-void Selection::DeselectMesh() { selMesh = nullptr; std::cout << "Deselected mesh.\n"; }
+void Selection::DeselectMesh() 
+{
+	if (selMesh == nullptr)
+		return;
+
+	selMesh = nullptr; 
+	std::cout << "Deselected mesh.\n"; 
+}
 
 // Clears the vertex selection
 void Selection::ClearVertSel() { selVerts.clear(); }
@@ -155,17 +198,31 @@ Selection::Selection()
 // Returns the nearest mesh to the clicked position
 Mesh* Selection::GetNearestMesh(Scene* scene, int i, int j)
 {
-	return nullptr;
+	float u = (j + 0.5f) / SCR_WIDTH;
+	float v = (i + 0.5f) / SCR_HEIGHT;
+	Ray ray = RayTracer::generateRay(scene->GetCamera(), u, v);
+	if (ray.DoesIntersect(scene->GetRenderTris()))
+		return scene->GetMeshes()->GetAll().begin()->second;
+	else
+		return nullptr;
 }
 
 // Returns the nearest vertex to the clicked position
 int Selection::GetNearestVert(Scene* scene, int i, int j)
 {
-	return -1;
+	float u = (j + 0.5f) / SCR_WIDTH;
+	float v = (i + 0.5f) / SCR_HEIGHT;
+	Ray ray = RayTracer::generateRay(scene->GetCamera(), u, v);
+	IndVertex res = ray.GetClosestVertex(scene->GetRenderTris());
+	return res.id;
 }
 
 // Returns the nearest face to the clicked position
 int Selection::GetNearestFace(Scene* scene, int i, int j)
 {
-	return -1;
+	float u = (j + 0.5f) / SCR_WIDTH;
+	float v = (i + 0.5f) / SCR_HEIGHT;
+	Ray ray = RayTracer::generateRay(scene->GetCamera(), u, v);
+	ITriangle res = ray.GetClosestTriangle(scene->GetRenderTris());
+	return res.triIndex;
 }

@@ -13,6 +13,7 @@ struct Triangle {
 	TriTag tag;
 
 	int vertices[TRI_VERTS];
+	int triIndex = -1;
 	int shadingGroup = -1;
 
 	Face GetFace();
@@ -23,5 +24,5 @@ struct Triangle {
 	Triangle(int i0, int i1, int i2);
 	Triangle(int i0, int i1, int i2, std::string _mat);
 	Triangle(int i0, int i1, int i2, std::string _mat, int _sg);
-	Triangle(int i0, int i1, int i2, glm::vec3 _norm, glm::vec3 _center, std::string _mat = "default", int _sg = -1, TriTag _tag = TriTag::UNCONFIRMED);
+	Triangle(int i0, int i1, int i2, glm::vec3 _norm, glm::vec3 _center, std::string _mat = "default", int _sg = -1, int _triIndex = -1, TriTag _tag = TriTag::UNCONFIRMED);
 };

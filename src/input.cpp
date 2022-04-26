@@ -270,6 +270,9 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
                     sel->SelectMesh(tempMesh);
                 break;
             case SelMode::FACE:
+                if (sel->GetSelectedMesh() == nullptr)
+                    break;
+
                 tempFace = Selection::GetNearestFace(scene, *prevX, *prevY);
                 if (sel->IsFaceSelected(tempFace))
                     sel->DeselectFace(tempFace);
@@ -277,12 +280,27 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
                     sel->SelectFace(tempFace);
                 break;
             case SelMode::VERT:
+                if (sel->GetSelectedMesh() == nullptr)
+                    break;
+
                 tempVert = Selection::GetNearestVert(scene, *prevX, *prevY);
                 if (sel->IsVertSelected(tempVert))
                     sel->DeselectVert(tempVert);
                 else
                     sel->SelectVert(tempVert);
                 break;
+            }
+
+            std::set<int> newSelVerts;
+            sel->GetSelectedVerts(newSelVerts);
+
+            for (auto iter = newSelVerts.begin(); iter != newSelVerts.end(); ++iter) {
+                if (selVerts.find(*iter) == selVerts.end())
+                    sel->newSelVerts.emplace(*iter);
+            }
+            for (auto iter = selVerts.begin(); iter != selVerts.end(); ++iter) {
+                if (newSelVerts.find(*iter) == newSelVerts.end())
+                    sel->removedSelVerts.emplace(*iter);
             }
         }
 

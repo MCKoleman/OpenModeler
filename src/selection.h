@@ -17,6 +17,9 @@ private:
 	Tool tool;
 	SelMode selMode;
 public:
+	std::set<int> newSelVerts;
+	std::set<int> removedSelVerts;
+
 	// Returns the entire selection as a selection of vertices
 	void GetSelectedVerts(std::vector<int>& _verts);
 	// Returns the entire selection as a selection of vertices
