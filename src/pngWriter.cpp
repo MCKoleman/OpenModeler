@@ -9,10 +9,10 @@ void Png::WritePngToFile(std::string location, std::string fileName)
         for (unsigned x = 0; x < width; x++) {
             //if(x == y)
             //    std::cout << "Writing value: " << 
-            image[4 * width * y + 4 * x + 0] = (char)img[x + width * y].r;
-            image[4 * width * y + 4 * x + 1] = (char)img[x + width * y].g;
-            image[4 * width * y + 4 * x + 2] = (char)img[x + width * y].b;
-            image[4 * width * y + 4 * x + 3] = (char)img[x + width * y].a;
+            image[4 * width * y + 4 * x + 0] = (char)glm::clamp(img[x + width * y].r, 0.0f, 255.0f);
+            image[4 * width * y + 4 * x + 1] = (char)glm::clamp(img[x + width * y].g, 0.0f, 255.0f);
+            image[4 * width * y + 4 * x + 2] = (char)glm::clamp(img[x + width * y].b, 0.0f, 255.0f);
+            image[4 * width * y + 4 * x + 3] = (char)glm::clamp(img[x + width * y].a, 0.0f, 255.0f);
         }
     }
     // Find file location

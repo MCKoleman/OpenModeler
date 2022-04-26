@@ -19,7 +19,7 @@ private:
 	std::vector<Triangle> tris;
 	std::vector<ITriangle> renderTris;
 public:
-	glm::vec3 bgColor = glm::vec3(255, 87, 51);
+	glm::vec3 bgColor = glm::vec3(230, 230, 230);
 
 	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel = nullptr);
 	void CalcRenderTris();

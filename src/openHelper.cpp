@@ -77,7 +77,7 @@ void OpenGLInitBuffers(ProgramIDs* ids, int vertsSize, float* vertices, int indi
 // -----------------------
 void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, unsigned int* indices)
 {
-    glClearColor(0.90f, 0.90f, 0.90f, 1.0f);
+    glClearColor(scene->bgColor.r / 255.0f, scene->bgColor.g / 255.0f, scene->bgColor.b / 255.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Draw the object

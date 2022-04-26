@@ -2,11 +2,11 @@
 #include "openHelper.h"
 
 //Returns a view ray
-Ray RayTracer::generateRay(Scene* scene, float u, float v)
+Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 {
 	Camera* camera = scene->GetCamera();
 
-	glm::mat4 inverseVP = glm::inverse(GetViewMatrix(scene) * GetProjectionMatrix(scene));
+	glm::mat4 inverseVP = glm::inverse(GetProjectionMatrix(scene) * GetViewMatrix(scene));
 
 	glm::vec3 eyePos = inverseVP * glm::vec4(camera->pos, 1.0f);
 	glm::vec3 lookAt = inverseVP * glm::vec4(camera->dir, 1.0f);
@@ -17,8 +17,15 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v)
 	glm::vec3 vVect = glm::normalize(glm::cross(wVect, uVect));
 
 	glm::vec3 origin = eyePos;
-	glm::vec3 direction = -1.0f * wVect + u * uVect + v * vVect;
+	glm::vec3 direction = - 1.0f * wVect + u * uVect + v * vVect;
 	
+	if (print) {
+		std::cout << "Generating ray from [" << origin.x << ", " << origin.y << ", " << origin.z << "] in direction [" 
+			<< direction.x << ", " << direction.y << ", " << direction.z << "]\n";
+		std::cout << "Camera info: Pos [" << camera->pos.x << ", " << camera->pos.y << ", " << camera->pos.z << "], Direction ["
+			<< camera->dir.x << ", " << camera->dir.y << ", " << camera->dir.z << "]\n";
+	}
+
 	return Ray(origin, direction);
 }
 
@@ -35,10 +42,10 @@ glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 
 	ITriangle foundTriangle = r.GetClosestTriangle(tris);
 	
-	if (foundTriangle.vertices[0].id < 0)
+	if (foundTriangle.vertices[0].id < 0) {
 		return scene->bgColor;
-	else
-	{
+	}
+	else {
 		Material* mat = scene->GetMats()->Get(foundTriangle.mat);
 		Light* light = scene->GetLight();
 
@@ -50,16 +57,7 @@ glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 		glm::vec3 diffuse = mat->kd * glm::max(0.0f, glm::dot(n, glm::normalize(-light->dir)));
 		glm::vec3 specular = mat->ks * (float)glm::pow(glm::max(0.0f, glm::dot(n, h)), 50);
 
-		glm::vec3 color = ambient + light->ks * (diffuse + specular);
-
-		if (color.x >= 255.0f)
-			color.x = 255.0f;
-		if (color.y >= 255.0f)
-			color.y = 255.0f;
-		if (color.z >= 255.0f)
-			color.z = 255.0f;
-
-		return color;
+		return glm::clamp(ambient + light->ks * (diffuse + specular), 0.0f, 255.0f);
 	}
 }
 
@@ -80,7 +78,7 @@ void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 			float u = (j + 0.5f) / SCR_WIDTH;
 			float v = (i + 0.5f) / SCR_HEIGHT;
 
-			Ray viewRay = generateRay(scene, u, v);
+			Ray viewRay = generateRay(scene, u, v, (i == j && (i == SCR_HEIGHT || i == 0)));
 			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 255.0f);
 		}
 	}
