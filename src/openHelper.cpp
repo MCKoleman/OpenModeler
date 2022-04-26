@@ -91,12 +91,6 @@ void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, 
     // Draw the object
     glUseProgram(ids->shaderProgram);
 
-    // TODO:
-    // Handle drawing the selection
-    //
-    std::vector<int> selectedVerts;
-    sel->GetSelectedVerts(selectedVerts);
-
     // Apply MVP
     glm::mat4 model = GetModelMatrix(scene);
     glm::mat4 view = GetViewMatrix(scene);

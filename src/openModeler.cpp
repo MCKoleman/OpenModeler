@@ -88,7 +88,15 @@ int main()
         ProcessInput(window, scene, &sel, &locks, deltaTime, &speeds, &prevX, &prevY);
 
         // Process changes in selections
-        if (sel.newSelVerts.size() != 0 || sel.removedSelVerts.size() != 0) {
+        if (locks.reselect) {
+            std::set<int> selVerts;
+            sel.GetSelectedVerts(selVerts);
+            std::unordered_map<int, Vertex> verts = scene->GetMeshes()->GetAll().begin()->second->GetVerts();
+            for (auto viter = verts.begin(); viter != verts.end(); ++viter) {
+                vertices[viter->first * VERT_SHADER_SIZE] = (selVerts.find(viter->first) != selVerts.end()) ? 1.0f : 0.0f;
+                std::cout << "Checking if " << viter->first << " is selected: " << (selVerts.find(viter->first) != selVerts.end() ? "true" : "false") << "\n";
+            }
+            /*
             std::cout << "Selecting [" << sel.newSelVerts.size() << "] new verts, removing [" << sel.removedSelVerts.size() << "]\n";
 
             for (auto iter = sel.newSelVerts.begin(); iter != sel.newSelVerts.end(); ++iter) {
@@ -97,10 +105,12 @@ int main()
             for (auto iter = sel.removedSelVerts.begin(); iter != sel.removedSelVerts.end(); ++iter) {
                 vertices[*iter * VERT_SHADER_SIZE] = 0.0f;
             }
-            sel.newSelVerts.clear();
-            sel.removedSelVerts.clear();
+            */
             glBindBuffer(GL_ARRAY_BUFFER, ids.VBO);
             glBufferData(GL_ARRAY_BUFFER, vertsSize * sizeof(vertices[0]), vertices, GL_STATIC_DRAW);
+            locks.reselect = false;
+
+            PrintArray("Testing vertex data", vertices, vertsSize, 10);
         }
 
         // Update VAO on rerender call

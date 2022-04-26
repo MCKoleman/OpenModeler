@@ -47,6 +47,7 @@ struct InputLocks {
 	bool lockLeftMouse = false;
 	bool lockRightMouse = false;
 
+	bool reselect = false;
 	bool rerender = false;
 
 	void ClearLocks();

@@ -17,7 +17,8 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 		std::unordered_map<int, Vertex> verts = curMesh->GetVerts();
 		glm::vec3 pos = curMesh->GetPos();
 		// Track out indices separate from loop
-		for (int i = 0; i < verts.size(); i++) {
+		for (auto viter = verts.begin(); viter != verts.end(); ++viter) {
+			int i = viter->first;
 			glm::vec3 vertPos = verts[i].pos;
 			glm::vec3 vertNorm = verts[i].normal;
 
