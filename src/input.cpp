@@ -292,6 +292,18 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
                 locks->reselect = true;
                 break;
             }
+
+            std::set<int> newSelVerts;
+            sel->GetSelectedVerts(newSelVerts);
+
+            for (auto iter = newSelVerts.begin(); iter != newSelVerts.end(); ++iter) {
+                if (selVerts.find(*iter) == selVerts.end())
+                    sel->newSelVerts.emplace(*iter);
+            }
+            for (auto iter = selVerts.begin(); iter != selVerts.end(); ++iter) {
+                if (newSelVerts.find(*iter) == newSelVerts.end())
+                    sel->removedSelVerts.emplace(*iter);
+            }
         }
 
         // Keep mouse where it was clicked
