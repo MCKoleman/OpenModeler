@@ -4,7 +4,8 @@ layout (triangle_strip, max_vertices = 3) out;
 
 in VS
 {
-	vec3 VertColor;
+	vec3 geoVertColor;
+	float vertExcludeEdge;
 } gs_in[];
 
 out GS
@@ -18,6 +19,7 @@ uniform vec2 WIN_SCALE;
 
 void main()
 {
+	float MEW = 100.0;
 	// taken from 'Single-Pass Wireframe Rendering'
 	vec2 p0 = WIN_SCALE * gl_in[0].gl_Position.xy/gl_in[0].gl_Position.w;
 	vec2 p1 = WIN_SCALE * gl_in[1].gl_Position.xy/gl_in[1].gl_Position.w;
@@ -27,15 +29,18 @@ void main()
 	vec2 v2 = p1-p0;
 	float area = abs(v1.x*v2.y - v1.y * v2.x);
 
-	gs_out.dist = vec3(area/length(v0),0,0);
+	gs_out.dist = vec3(area/length(v0),gs_in[1].vertExcludeEdge*MEW,gs_in[2].vertExcludeEdge*MEW);
 	gl_Position = gl_in[0].gl_Position;
+	gs_out.VertColor = gs_in[0].geoVertColor;
 	EmitVertex();
 	
-	gs_out.dist = vec3(0,area/length(v1),0);
+	gs_out.dist = vec3(gs_in[0].vertExcludeEdge*MEW,area/length(v1),gs_in[2].vertExcludeEdge*MEW);
 	gl_Position = gl_in[1].gl_Position;
+	gs_out.VertColor = gs_in[1].geoVertColor;
 	EmitVertex();
 	
-	gs_out.dist = vec3(0,0,area/length(v2));
+	gs_out.dist = vec3(gs_in[0].vertExcludeEdge*MEW,gs_in[1].vertExcludeEdge*MEW,area/length(v2));
+	gs_out.VertColor = gs_in[2].geoVertColor;
 	gl_Position = gl_in[2].gl_Position;
 	
 	EmitVertex();
