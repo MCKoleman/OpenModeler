@@ -105,6 +105,7 @@ Press `[WASDZX]` to move selection forward/left/back/right/up/down
 
 ##### When in scale mode:
 Press `[WASDZX]` to scale selection
+
 Holding shift while scaling will scale uniformly in all directions
 
 ##### When in rotate mode
