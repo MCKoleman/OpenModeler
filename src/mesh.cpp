@@ -34,7 +34,7 @@ glm::vec3 Mesh::GetForward() { return forward; }
 
 void Mesh::Translate(glm::vec3 _deltaPos) { pos += _deltaPos; }
 void Mesh::Rotate(glm::vec3 _deltaRot) { rotation += _deltaRot; }
-void Mesh::Scale(glm::vec3 _deltaScale) { scale = glm::vec3(scale.x * _deltaScale.x, scale.y * _deltaScale.y, scale.z * _deltaScale.z); }
+void Mesh::Scale(glm::vec3 _deltaScale) { scale = glm::max(glm::vec3(scale.x * _deltaScale.x, scale.y * _deltaScale.y, scale.z * _deltaScale.z), MIN_SCALE); }
 
 glm::vec3 Mesh::GetPos() { return pos; }
 glm::vec3 Mesh::GetRotation() { return rotation; }
@@ -45,6 +45,31 @@ void Mesh::SetPos(glm::vec3 _pos) { pos = _pos; }
 void Mesh::SetRotation(glm::vec3 _rot) { rotation = _rot; }
 void Mesh::SetScale(glm::vec3 _scale) { scale = glm::max(_scale, MIN_SCALE); }
 
+// Translate the given verts by the given vector
+void Mesh::Translate(std::set<int>& _verts, glm::vec3 _deltaPos)
+{
+	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
+		verts[*iter].pos += _deltaPos;
+	}
+}
+
+// Rotates the given verts by the given vector
+void Mesh::Rotate(std::set<int>& _verts, glm::vec3 _deltaRot, glm::vec3 _pivot)
+{
+	glm::vec3 _deltaPos = _deltaRot;
+	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
+		verts[*iter].pos += _deltaPos;
+	}
+}
+
+// Scales the given verts by the given vector
+void Mesh::Scale(std::set<int>& _verts, glm::vec3 _deltaScale, glm::vec3 _pivot)
+{
+	glm::vec3 _deltaPos = _deltaScale;
+	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
+		verts[*iter].pos += _deltaPos;
+	}
+}
 // Mesh main function definitions
 // ------------------------------
 void Mesh::AddFace(Face _face) { faces.push_back(_face); }
@@ -94,7 +119,7 @@ std::vector<Triangle>& Mesh::GetTris(std::vector<Triangle>& _tris)
 {
 	// Convert all stored faces into tris
 	for (int i = 0; i < faces.size(); i++) {
-		faces[i].GetTri(_tris, verts);
+		faces[i].GetTri(_tris, verts, i);
 	}
 	return _tris;
 }

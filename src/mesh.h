@@ -3,6 +3,7 @@
 #include "face.h"
 #include <vector>
 #include <unordered_map>
+#include <set>
 const float MIN_SCALE = 0.0000001f;
 
 class Mesh {
@@ -54,6 +55,12 @@ public:
 	void Rotate(glm::vec3 _deltaRot);
 	// Scales the mesh by the given vector
 	void Scale(glm::vec3 _deltaScale);
+	// Translate the given verts by the given vector
+	void Translate(std::set<int>& _verts, glm::vec3 _deltaPos);
+	// Rotates the given verts by the given vector
+	void Rotate(std::set<int>& _verts, glm::vec3 _deltaRot, glm::vec3 _pivot);
+	// Scales the given verts by the given vector
+	void Scale(std::set<int>& _verts, glm::vec3 _deltaScale, glm::vec3 _pivot);
 	// Sets the position of the mesh to the given position
 	void SetPos(glm::vec3 _pos);
 	// Sets the rotation of the mesh to the given rotation

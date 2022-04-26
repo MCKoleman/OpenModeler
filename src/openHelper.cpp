@@ -95,7 +95,6 @@ void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, 
     // Handle drawing the selection
     //
     std::vector<int> selectedVerts;
-    sel->SelectMesh(scene->GetMeshes()->GetAll().begin()->second);
     sel->GetSelectedVerts(selectedVerts);
 
     // Apply MVP

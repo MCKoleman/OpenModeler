@@ -58,6 +58,36 @@ ITriangle Ray::GetClosestTriangle(std::vector<ITriangle>& tris)
 	return closestTri;
 }
 
+//Returns a pointer to the first triangle that the view ray intersects with
+IndVertex Ray::GetClosestVertex(std::vector<ITriangle>& tris)
+{
+	float t = 100.0f;
+	IndVertex closestVert = IndVertex();
+
+	for (int i = 0; i < tris.size(); i++)
+	{
+		if (IntersectTriangle(tris[i]))
+		{
+			float t2 = GetT(tris[i]);
+			if (t2 <= t)
+			{
+				t = t2;
+				glm::vec3 intersectionPos = origin + direction * t2;
+				closestVert = tris[i].vertices[0];
+				// Find closest vert along closest tri, skipping the first one
+				for (int j = 1; j < TRI_VERTS; j++) {
+					glm::vec3 newPos = tris[i].vertices[j].ver.pos;
+
+					if (glm::distance(newPos, intersectionPos) < glm::distance(closestVert.ver.pos, intersectionPos))
+						closestVert = tris[i].vertices[j];
+				}
+			}
+		}
+	}
+
+	return closestVert;
+}
+
 // Returns the number of intersections that the ray had with given triangles
 int Ray::GetNumIntersects(std::vector<ITriangle>& tris)
 {
@@ -68,4 +98,15 @@ int Ray::GetNumIntersects(std::vector<ITriangle>& tris)
 			numIntersects++;
 	}
 	return numIntersects;
+}
+
+// Checks whether the ray intersects with the given list of triangles
+bool Ray::DoesIntersect(std::vector<ITriangle>& tris)
+{
+	for (int i = 0; i < tris.size(); i++)
+	{
+		if (IntersectTriangle(tris[i]))
+			return true;
+	}
+	return false;
 }
