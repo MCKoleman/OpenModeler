@@ -183,7 +183,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
             // Handle render
             Png pngResult = Png(SCR_WIDTH, SCR_HEIGHT);
             RayTracer::RayTrace(scene, pngResult.img);
-            pngResult.WritePngToFile("../out/", "resultRender.png");
+            pngResult.WritePngToFile("../out/", "renderResult");
             locks->lockCtrlR = true;
         }
         didReceiveInput = true;

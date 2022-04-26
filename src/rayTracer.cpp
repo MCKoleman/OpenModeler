@@ -26,17 +26,17 @@ glm::vec3 RayTracer::getPixelColor(Scene* scene, Ray& r, int count)
 {
 	std::vector<ITriangle> tris = scene->GetRenderTris();
 
-	ITriangle* foundTriangle = r.GetClosestTriangle(tris);
+	ITriangle foundTriangle = r.GetClosestTriangle(tris);
 	
-	if (foundTriangle == nullptr)
+	if (foundTriangle.vertices[0].id < 0)
 		return scene->bgColor;
 	else
 	{
-		Material* mat = scene->GetMats()->Get(foundTriangle->mat);
+		Material* mat = scene->GetMats()->Get(foundTriangle.mat);
 		Light* light = scene->GetLight();
 
-		glm::vec3 p = r.origin + (r.GetT(*foundTriangle) * r.direction);
-		glm::vec3 n = foundTriangle->normal;
+		glm::vec3 p = r.origin + (r.GetT(foundTriangle) * r.direction);
+		glm::vec3 n = foundTriangle.normal;
 		glm::vec3 h = glm::normalize(bisector(p, -light->dir));
 
 		glm::vec3 ambient = mat->ka * light->ka;
@@ -55,17 +55,19 @@ glm::vec3 RayTracer::normal(std::vector<glm::vec3>& vPos)
 //Returns a pointer to an array that defines each pixel in the ray traced scene
 void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 {
+	std::cout << "Started rendering scene\n";
 	Camera* camera = scene->GetCamera();
 
 	for (int i = 0; i < SCR_HEIGHT; i++)
 	{
-		for (int j = 0; i < SCR_WIDTH; j++)
+		for (int j = 0; j < SCR_WIDTH; j++)
 		{
 			float u = (j + 0.5f) / SCR_WIDTH;
 			float v = (i + 0.5f) / SCR_HEIGHT;
 
 			Ray viewRay = generateRay(scene->GetCamera(), u, v);
-			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 1.0f);
+			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 255.0f);
 		}
 	}
+	std::cout << "Finished rendering scene\n";
 }

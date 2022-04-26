@@ -35,9 +35,9 @@ ITriangle::ITriangle()
 {
 	mat = "default";
 	shadingGroup = -1;
-	vertices[0] = IndVertex();
-	vertices[1] = IndVertex();
-	vertices[2] = IndVertex();
+	vertices[0] = IndVertex(-1, Vertex());
+	vertices[1] = IndVertex(-1, Vertex());
+	vertices[2] = IndVertex(-1, Vertex());
 	CalcNormal();
 }
 
