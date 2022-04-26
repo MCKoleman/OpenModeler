@@ -44,6 +44,7 @@ int main()
     int indicesSize = scene->GetIndexCount();
     float* vertices = new float[vertsSize];
     unsigned int* indices = new unsigned int[indicesSize];
+    scene->CalcRenderTris();
     scene->GetVAO(vertices, vertsSize, indices, indicesSize);
 
     // Print vertices and indices

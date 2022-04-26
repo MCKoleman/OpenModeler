@@ -2,7 +2,6 @@
 
 void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel)
 {
-	CalcRenderTris();
 	//std::cout << "Writing " << vertsSize << " vertices to VAO, " << verts.size() << " exist" << std::endl;
 	//std::cout << "Writing " << indicesSize << " indices to VAO, " << tris.size() << " exist" << std::endl;
 
@@ -53,7 +52,7 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 		}
 		startIndex += (int)verts.size();
 	}
-	std::cout << "Highest element written to vertices: " << tempHighIndex << std::endl;
+	//std::cout << "Highest element written to vertices: " << tempHighIndex << std::endl;
 
 	// Track out indices separate from loop
 	std::vector<Triangle> tris = GetTris();
@@ -63,7 +62,7 @@ void Scene::GetVAO(float* vertices, int vertsSize, unsigned int* indices, int in
 			tempHighIndex = i * TRI_VERTS + j;
 		}
 	}
-	std::cout << "Highest element written to indices: " << tempHighIndex << std::endl;
+	//std::cout << "Highest element written to indices: " << tempHighIndex << std::endl;
 }
 
 void Scene::CalcRenderTris()
