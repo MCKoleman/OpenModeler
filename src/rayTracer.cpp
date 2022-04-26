@@ -6,18 +6,17 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 {
 	Camera* camera = scene->GetCamera();
 
-	glm::mat4 inverseVP = scene->GetInvMVP();
-
-	glm::vec3 eyePos = inverseVP * glm::vec4(camera->pos, 1.0f);
-	glm::vec3 lookAt = inverseVP * glm::vec4(camera->dir, 1.0f);
+	glm::vec3 eyePos = camera->pos;
+	glm::vec3 lookAt = camera->dir;
 	glm::vec3 upVect = camera->up;
 
 	glm::vec3 wVect = -lookAt;
 	glm::vec3 uVect = glm::normalize(glm::cross(wVect, upVect));
 	glm::vec3 vVect = glm::normalize(glm::cross(wVect, uVect));
 
-	glm::vec3 origin = eyePos;
-	glm::vec3 direction = - 1.0f * wVect + u * uVect + v * vVect;
+	glm::vec3 origin = scene->GetInvMVP() * glm::vec4(eyePos, 1.0f);
+	glm::vec3 direction = glm::normalize(scene->GetInvMVP() * glm::vec4(u, v, -1, 1));
+	//glm::vec3 direction = scene->GetInvMVP() * glm::vec4(- 1.0f * wVect + u * uVect + v * vVect, 1.0f);
 	
 	if (print) {
 		std::cout << "Generating ray from [" << origin.x << ", " << origin.y << ", " << origin.z << "] in direction [" 
@@ -26,7 +25,7 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 			<< camera->dir.x << ", " << camera->dir.y << ", " << camera->dir.z << "]\n";
 	}
 
-	return Ray(origin, direction);
+	return Ray(origin, glm::normalize(direction));
 }
 
 //Returns bisector of given vectors
