@@ -19,3 +19,4 @@ glm::mat4 CalcMVP(Scene* scene);
 glm::mat4 GetProjectionMatrix(Scene* scene);
 glm::mat4 GetViewMatrix(Scene* scene);
 glm::mat4 GetModelMatrix(Scene* scene);
+glm::vec4 RotateAround(glm::vec4 aPointToRotate, glm::vec4 aRotationCenter, glm::mat4x4 aRotationMatrix);

@@ -110,6 +110,7 @@ int main()
             }
             sel.newSelVerts.clear();
             sel.removedSelVerts.clear();
+            sel.CalcSelPivot();
 
             glBindBuffer(GL_ARRAY_BUFFER, ids.VBO);
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertsSize * sizeof(vertices[0]), vertices);

@@ -200,6 +200,22 @@ glm::mat4 GetModelMatrix(Scene* scene)
     return glm::scale(modelUnscaled, scale);
 }
 
+// Taken from https://gamedev.stackexchange.com/questions/115032/how-should-i-rotate-vertices-around-the-origin-on-the-cpu
+glm::vec4 RotateAround(glm::vec4 aPointToRotate, glm::vec4 aRotationCenter, glm::mat4x4 aRotationMatrix)
+{
+    glm::mat4x4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(aRotationCenter.x, aRotationCenter.y, aRotationCenter.z));
+    glm::mat4x4 invTranslate = glm::inverse(translate);
+
+    // The idea:
+    // 1) Translate the object to the center
+    // 2) Make the rotation
+    // 3) Translate the object back to its original location
+
+    glm::mat4x4 transform = translate * aRotationMatrix * invTranslate;
+
+    return transform * aPointToRotate;
+}
+
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)

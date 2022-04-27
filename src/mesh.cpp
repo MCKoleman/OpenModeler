@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "openHelper.h"
 
 void Mesh::CalcBasis()
 {
@@ -56,18 +57,23 @@ void Mesh::Translate(std::set<int>& _verts, glm::vec3 _deltaPos)
 // Rotates the given verts by the given vector
 void Mesh::Rotate(std::set<int>& _verts, glm::vec3 _deltaRot, glm::vec3 _pivot)
 {
-	glm::vec3 _deltaPos = _deltaRot;
+	glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(_deltaRot.x), glm::vec3(0, 1, 0));
+	glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(_deltaRot.y), glm::vec3(1, 0, 0));
+	glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(_deltaRot.z), glm::vec3(0, 0, 1));
+	glm::mat4 rotMat = rotateZ * rotateY * rotateX;
+
 	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
-		verts[*iter].pos += _deltaPos;
+		verts[*iter].pos = RotateAround(glm::vec4(verts[*iter].pos, 1.0f), glm::vec4(_pivot, 1.0f), rotMat);
 	}
 }
 
 // Scales the given verts by the given vector
 void Mesh::Scale(std::set<int>& _verts, glm::vec3 _deltaScale, glm::vec3 _pivot)
 {
-	glm::vec3 _deltaPos = _deltaScale;
 	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
-		verts[*iter].pos += _deltaPos;
+		glm::vec3 tempPos = verts[*iter].pos - _pivot;
+		tempPos *= _deltaScale;
+		verts[*iter].pos = tempPos + _pivot;
 	}
 }
 // Mesh main function definitions
