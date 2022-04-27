@@ -90,7 +90,7 @@ void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 			float u = left + (right - left) * (j + 0.5f) / (float)SCR_WIDTH;
 			float v = bottom + (top - bottom) * (i + 0.5f) / (float)SCR_HEIGHT;
 
-			Ray viewRay = generateRay(scene, u, v, (i == j && (i == SCR_HEIGHT || i == 0)));
+			Ray viewRay = generateRay(scene, u, v, false);
 			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 255.0f);
 
 			lowestDir = glm::min(lowestDir, viewRay.direction);
@@ -98,8 +98,8 @@ void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 		}
 	}
 	glm::vec3 dirDiff = highestDir - lowestDir;
-	std::cout << "Difference between directions: [" << dirDiff.x << ", " << dirDiff.y << ", " << dirDiff.z << "]\n";
-	std::cout << "Highest direction: [" << highestDir.x << ", " << highestDir.y << ", " << highestDir.z << "]\n";
-	std::cout << "Lowest direction: [" << lowestDir.x << ", " << lowestDir.y << ", " << lowestDir.z << "]\n";
+	//std::cout << "Difference between directions: [" << dirDiff.x << ", " << dirDiff.y << ", " << dirDiff.z << "]\n";
+	//std::cout << "Highest direction: [" << highestDir.x << ", " << highestDir.y << ", " << highestDir.z << "]\n";
+	//std::cout << "Lowest direction: [" << lowestDir.x << ", " << lowestDir.y << ", " << lowestDir.z << "]\n";
 	std::cout << "Finished rendering scene\n";
 }
