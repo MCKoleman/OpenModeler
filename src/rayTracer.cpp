@@ -6,10 +6,8 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 {
 	Camera* camera = scene->GetCamera();
 
-	glm::mat4 inverseVP = scene->GetInvMVP();
-
-	glm::vec3 eyePos = inverseVP * glm::vec4(camera->pos, 1.0f);
-	glm::vec3 lookAt = inverseVP * glm::vec4(camera->dir, 1.0f);
+	glm::vec3 eyePos = camera->pos;
+	glm::vec3 lookAt = camera->dir;
 	glm::vec3 upVect = camera->up;
 
 	glm::vec3 wVect = -lookAt;
@@ -31,7 +29,7 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 			<< camera->dir.x << ", " << camera->dir.y << ", " << camera->dir.z << "]\n";
 	}
 
-	return Ray(origin, direction);
+	return Ray(origin, glm::normalize(direction));
 }
 
 //Returns bisector of given vectors
