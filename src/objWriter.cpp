@@ -10,9 +10,9 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 		counter++;
 	}
 
-	Mesh* mesh = scene->GetCurMesh();
+	Mesh* mesh = scene->GetMeshes()->GetAll().begin()->second;
 	auto verts = mesh->GetVerts();
-	auto tris = mesh->GetTris();
+	auto faces = mesh->GetFaces();
 
     // Open the object
 	// ---------------
@@ -39,7 +39,7 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 
 	// Write vertices
 	// --------------
-	objFile << "g\n";
+	objFile << "g default\n";
 	int vertsSize = (int)verts.size();
 	bool anyTexts = false;
 	for (int i = 0; i < vertsSize; i++)
@@ -77,34 +77,35 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 
 	// Write faces
 	// -----------
-	objFile << "g default\n";
-	int trisSize = (int)tris.size();
+	int facesSize = (int)faces.size();
 	std::string curMat = "";
-	for (int i = 0; i < trisSize; i++)
+	for (int i = 0; i < facesSize; i++)
 	{
-		std::string tempMat = tris[i].mat;
-		auto triVerts = tris[i].vertices;
+		std::string tempMat = faces[i].mat;
+		auto faceVerts = faces[i].vertices;
 
 		// Write material info if there is a change in materials
 		if (tempMat != curMat) {
 			curMat = tempMat;
 			objFile << "g " << curMat << "\n";
+			objFile << "usemtl " << curMat << "\n";
 		}
 
-		// Store texture data if it is used
-		if (anyTexts) {
-			objFile << "f " <<	(triVerts[0]+1) << "/" << (triVerts[0]+1) << "/" << (triVerts[0]+1) << " ";
-			objFile <<			(triVerts[1]+1) << "/" << (triVerts[1]+1) << "/" << (triVerts[1]+1) << " ";
-			objFile <<			(triVerts[2]+1) << "/" << (triVerts[2]+1) << "/" << (triVerts[2]+1) << "\n";
+		// Write face
+		objFile << "f ";
+		for (int fi = 0; fi < faceVerts.size(); fi++) {
+			// Store texture data if it is used
+			if (anyTexts) {
+				objFile << (faceVerts[fi] + 1) << "/" << (faceVerts[fi] + 1) << "/" << (faceVerts[fi] + 1) << " ";
+			}
+			// Only store normal and vertex data if there are no textures
+			else {
+				objFile << (faceVerts[fi] + 1) << "//" << (faceVerts[fi] + 1) << " ";
+			}
 		}
-		// Only store normal and vertex data if there are no textures
-		else {
-			objFile << "f " <<	(triVerts[0]+1) << "//" << (triVerts[0]+1) << " ";
-			objFile <<			(triVerts[1]+1) << "//" << (triVerts[1]+1) << " ";
-			objFile <<			(triVerts[2]+1) << "//" << (triVerts[2]+1) << "\n";
-		}
+		objFile << "\n";
 	}
-	objFile << "# " << trisSize << " faces\n\n";
+	objFile << "# " << facesSize << " faces\n\n";
 
 	// Write material groups
 	// ---------------------
@@ -112,6 +113,7 @@ void WriteObjToFile(Scene* scene, std::string location, std::string fileName)
 	// Close file
 	// ----------
 	objFile.close();
+	std::cout << "Wrote file: " << objLoc << std::endl;
 }
 
 void WriteMtlToFile(MaterialStorage* mat, std::string location, std::string fileName)

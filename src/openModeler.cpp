@@ -13,8 +13,8 @@ int main()
 
     // Build and compile shader program
     // ------------------------------------
-    ProgramIDs* ids = new ProgramIDs();
-    ids->shaderProgram = LoadShaderProgram(options.phong == 1);
+    ProgramIDs ids = ProgramIDs();
+    ids.shaderProgram = LoadShaderProgram(options.phong == 1);
 
     // Create scene
     // ------------
@@ -30,41 +30,47 @@ int main()
 
     // Read mesh
     // ---------
-    Mesh* displayMesh = scene->GetCurMesh();
+    Mesh* displayMesh = scene->GetMeshes()->GetAll().begin()->second;
 
     // Read mesh from file
     ReadObjFromFile(displayMesh, scene->GetMats(), "../models/", options.objName);
     displayMesh->Scale(glm::vec3(options.objScale, options.objScale, options.objScale));
     displayMesh->SetPos(options.objPos);
+    displayMesh->CalcPivot();
 
     // Load up model into vertice and indice structures
     // Get vertices
-    int vertsSize = displayMesh->GetVertCount() * 9;
+    int vertsSize = scene->GetVertCount() * 10;
+    int indicesSize = scene->GetIndexCount();
     float* vertices = new float[vertsSize];
-    int indicesSize = displayMesh->GetIndexCount();
     unsigned int* indices = new unsigned int[indicesSize];
+    scene->CalcRenderTris();
     scene->GetVAO(vertices, vertsSize, indices, indicesSize);
+    scene->CalcInvMVP();
 
     // Print vertices and indices
     if (options.print == 1) {
-        PrintArray("Printing vertices:", vertices, vertsSize, 9);
+        PrintArray("Printing vertices:", vertices, vertsSize, 10);
         PrintArray("Printing indices:", indices, indicesSize, 3);
     }
 
     // Init VAO, VBO, and EBO
-    OpenGLInitBuffers(ids, vertsSize, vertices, indicesSize, indices);
+    OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
 
     // Enable wireframe if requested in options
-    if (options.wireframe == 1) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }
+    OpenGLEnableWireframe(options.wireframe == 1);
 
     // Init variables to track user input. Speed constants declared in order:
     // CamMove, CamTurn, ModelMove, ModelTurn, ModelScale, MouseMove, MouseTurn
     SpeedConsts speeds = SpeedConsts(2.0f, 1.0f, 0.3f, 30.0f, 1.0f, 0.1f, 0.1f);
-    InputLocks* locks = new InputLocks();
+    InputLocks locks = InputLocks();
     int prevX = -1;
     int prevY = -1;
+
+    // Get selection
+    Selection sel = Selection();
+    sel.SetSelMode(SelMode::MESH);
+    sel.SetTool(Tool::SELECT);
 
     // Track time
     double lastTime = glfwGetTime();
@@ -81,8 +87,59 @@ int main()
         deltaTime = float(currentTime - lastTime);
 
         // Process input and render
-        ProcessInput(window, scene, locks, deltaTime, &speeds, &prevX, &prevY);
-        OpenGLDraw(scene, ids, indicesSize, indices);
+        ProcessInput(window, scene, &sel, &locks, &options, &speeds, deltaTime, &prevX, &prevY);
+
+        // Process changes in selections
+        if (sel.newSelVerts.size() != 0 || sel.removedSelVerts.size() != 0) {
+            /*
+            std::set<int> selVerts;
+            sel.GetSelectedVerts(selVerts);
+            std::unordered_map<int, Vertex> verts = scene->GetMeshes()->GetAll().begin()->second->GetVerts();
+            for (auto viter = verts.begin(); viter != verts.end(); ++viter) {
+                vertices[viter->first * VERT_SHADER_SIZE] = (selVerts.find(viter->first) != selVerts.end()) ? 1.0f : 0.0f;
+                std::cout << "Checking if " << viter->first << " is selected: " << (selVerts.find(viter->first) != selVerts.end() ? "true" : "false") << "\n";
+            }
+            */
+            //std::cout << "Selecting [" << sel.newSelVerts.size() << "] new verts, removing [" << sel.removedSelVerts.size() << "]\n";
+
+            for (auto iter = sel.newSelVerts.begin(); iter != sel.newSelVerts.end(); ++iter) {
+                vertices[*iter * VERT_SHADER_SIZE] = 1.0f;
+            }
+            for (auto iter = sel.removedSelVerts.begin(); iter != sel.removedSelVerts.end(); ++iter) {
+                vertices[*iter * VERT_SHADER_SIZE] = 0.0f;
+            }
+            sel.newSelVerts.clear();
+            sel.removedSelVerts.clear();
+            sel.CalcSelPivot();
+
+            glBindBuffer(GL_ARRAY_BUFFER, ids.VBO);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertsSize * sizeof(vertices[0]), vertices);
+            locks.reselect = false;
+
+            //PrintArray("Testing vertex data", vertices, vertsSize, 10);
+        }
+
+        // Update VAO on rerender call
+        if (locks.rerender) {
+            // Clear previous data
+            delete[] vertices;
+            delete[] indices;
+
+            // Set new data
+            vertsSize = scene->GetVertCount() * 10;
+            indicesSize = scene->GetIndexCount();
+            vertices = new float[vertsSize];
+            indices = new unsigned int[indicesSize];
+
+            scene->GetVAO(vertices, vertsSize, indices, indicesSize, &sel);
+            OpenGLInitBuffers(&ids, vertsSize, vertices, indicesSize, indices);
+
+            // Reset rerender
+            locks.rerender = false;
+        }
+
+        // Render
+        OpenGLDraw(scene, &sel, &ids, indicesSize, indices);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -92,12 +149,10 @@ int main()
 
     // Clear up dynamic memory usage
     // -----------------------------
-    OpenGLCleanup(ids);
+    OpenGLCleanup(&ids);
     delete[] vertices;
     delete[] indices;
-    delete locks;
     delete scene;
-    delete ids;
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

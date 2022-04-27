@@ -8,3 +8,5 @@
 #include <glm/gtc/matrix_transform.hpp>
 constexpr float PI = 3.14159f;
 constexpr float HALF_PI = 1.57079f;
+
+#define VERT_SHADER_SIZE 10

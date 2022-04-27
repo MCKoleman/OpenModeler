@@ -1,9 +1,14 @@
 #version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNorm;
-layout (location = 2) in vec3 aColor;
+layout (location = 0) in float isSelected;
+layout (location = 1) in vec3 aPos;
+layout (location = 2) in vec3 aNorm;
+layout (location = 3) in vec3 aColor;
 
-out vec3 VertColor;
+out VS
+{
+	vec3 geoVertColor;
+	float vertExcludeEdge;
+};
 
 uniform mat4 MVP;
 uniform mat4 Model;
@@ -33,5 +38,10 @@ void main()
     vec3 reflectDir = reflect(-lightDir, norm);
     vec3 specular = pow(max(dot(viewDir, reflectDir), 0.0), 32) * SpecularStrength * LightColor;
 
-    VertColor = (ambient + diffuse + specular) * aColor;
+	if (isSelected == 1.0)
+      vertExcludeEdge = 0.0;
+	else
+      vertExcludeEdge = 1.0;
+
+    geoVertColor = (ambient + diffuse + specular) * aColor;
 }

@@ -29,16 +29,14 @@ In `/config.txt`, choose which model to load and options on how to load it.
 The project comes with several 3D models, but new ones can be placed in the `/models/` folder and selected in `/config.txt` to be loaded.
 
 ### Options usage:
-Which object should be loaded by the program. Should be a '.obj' file
+Which object should be loaded by the program. This should be a '.obj' file
 `object = cube.obj`
-Scale of the object in the program. Should be in range (0, 1]
+Scale of the object in the program. This should be in range (0, 1]
 `scale = 0.6`
 Position of the object in the program. Marked as <x, y, z> coordinates
 `position = 0.0 0.0 0.0`
 Default color of meshes. Marked as <r, g, b> data
 `dcolor = 0.8 0.8 0.8`
-Vertex model. [0] separate, [1] indexed. Indexed data structure may cause issues with complicated models with non-triangular faces
-`vertexmodel = 0`
 Should model be drawn in wireframe? [0] No, [1] Yes
 `wireframe = 0`
 Should the model information be printed in the console? [0] No, [1] Yes
@@ -63,61 +61,65 @@ Should the camera be in perspective? [1] Yes, [0] No
 `perspective = 1`
 
 ### Program usage:
-Press `[W]` to move mesh forward
+Without a fancy UI to assist you, the console is your best friend and you 
+are strongly encouraged to view the console side-by-side with the program to see what tool is selected etc.
 
-Press `[S]` to move mesh back
+#### Tool selection
+Press `[1]` to turn on mesh selection mode 
 
-Press `[D]` to move mesh right
+Press `[2]` to turn on vertex selection mode
 
-Press `[A]` to move mesh left
+Press `[3]` to turn on face selection mode
 
-Press `[Space]` to move mesh up
-
-Press `[Shift]` to move mesh down
-
-
-Press `[Alt + W]` to move camera forward
-
-Press `[Alt + S]` to move camera back
-
-Press `[Alt + D]` to move camera right
-
-Press `[Alt + A]` to move camera left
-
-Press `[Alt + Space]` to move camera up
-
-Press `[Alt + Shift]` to move camera down
+Press `[5]` to toggle wireframe on and off
 
 
-Press `[Q]` to scale mesh up
+Press `[Q]` to turn on selection mode
 
-Press `[E]` to scale mesh down
+Press `[E]` to turn on scale mode
 
-Press `[Up Arrow]` to rotate mesh up
+Press `[R]` to turn on rotate mode
 
-Press `[Down Arrow]` to rotate mesh down
+Press `[T]` to turn on translate mode
 
-Press `[Right Arrow]` to rotate mesh right
-
-Press `[Left Arrow]` to rotate mesh left
+Press `[Ctrl + E]` to turn on extrude mode
 
 
-Press `[Alt + Up Arrow]` to rotate camera up
+#### Camera controls
+Hold `[Alt]` + Press `[WASDZX]` to move the camera forward/left/back/right/up/down
 
-Press `[Alt + Down Arrow]` to rotate camera down
+Hold `[Alt]` + Press `[Arrows Keys]` to rotate 
 
-Press `[Alt + Right Arrow]` to rotate camera right
+Hold `[Alt]` + Press `[Left Mouse Button]` to rotate camera with the mouse
 
-Press `[Alt + Left Arrow]` to rotate camera left
-
-Press `[F]` to focus camera on the mesh
+Hold `[Alt]` + Press `[Right Mouse Button]` to move camera with the mouse
 
 
-Press `[Alt + Left Mouse Button]` to rotate camera with the mouse
+#### Selection functions
+Press `[Del]` to delete all currently selected vertices (this may cause holes in the mesh, so be careful)
 
-Press `[Alt + Right Mouse Button]` to move camera with the mouse
+Press `[Left Mouse Button]` to select the mesh/vertex/face your mouse is currently over, depending on which selection mode you are in
 
-Press `[Ctrl + S] to save the object to file`
+##### When in translate mode:
+Press `[WASDZX]` to move selection forward/left/back/right/up/down
+
+##### When in scale mode:
+Press `[WASDZX]` to scale selection
+
+Holding shift while scaling will scale uniformly in all directions
+
+##### When in rotate mode
+Press `[WASDZX]` to rotate selection
+
+#### Program functions
+
+Press `[F]` to focus the camera on the current object
+
+Press `[Ctrl + T]` to triangulate the mesh (this is irreversible)
+
+Press `[Ctrl + R]` to render the current view to a file (this may take a while)
+
+Press `[Ctrl + S]` to save the object to file
 
 Press `[Esc]` to exit the program
 

@@ -1,6 +1,8 @@
 #pragma once
-#include "mesh.h"
 #include "glIncludes.h"
+#include "vertex.h"
+#include <vector>
+#include <string>
 
 struct ProgramIDs
 {
@@ -16,6 +18,7 @@ struct ProgramIDs
 	unsigned int viewPosID;
 	unsigned int ambientStrengthID;
 	unsigned int specularStrengthID;
+	unsigned int winScaleID;
 
 	void GetUniformIDs();
 };

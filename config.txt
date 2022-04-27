@@ -1,5 +1,5 @@
 # Which object should be loaded by the program
-object = testCube
+object = cube
 
 # Scale of the object in the program
 scale = 0.6
@@ -10,9 +10,6 @@ position = 0.0 0.0 0.0
 # Default color
 dcolor = 0.8 0.8 0.8
 
-# Vertex model [0] separate, [1] indexed
-vertexmodel = 1
-
 # Should model be drawn in wireframe? [0] No, [1] Yes
 wireframe = 0
 
@@ -20,7 +17,7 @@ wireframe = 0
 print = 0
 
 # Should the model be rendered using Gouraud [0] or Phong [1] shading
-phong = 0
+phong = 1
 
 # Camera options
 # Camera start position. This is the position of the camera by default

@@ -1,4 +1,5 @@
 #include "mesh.h"
+#include "openHelper.h"
 
 void Mesh::CalcBasis()
 {
@@ -19,77 +20,66 @@ void Mesh::CalcBasis()
     up = glm::cross(right, forward);
 }
 
-glm::vec3 Mesh::GetUp()
+void Mesh::CalcPivot()
 {
-    return up;
+	pivot = glm::vec3(0, 0, 0);
+	for (auto iter = verts.begin(); iter != verts.end(); ++iter) {
+		pivot += iter->second.pos;
+	}
+	pivot /= (float)verts.size();
 }
 
-glm::vec3 Mesh::GetRight()
+glm::vec3 Mesh::GetUp() { return up; }
+glm::vec3 Mesh::GetRight() { return right; }
+glm::vec3 Mesh::GetForward() { return forward; }
+
+void Mesh::Translate(glm::vec3 _deltaPos) { pos += _deltaPos; }
+void Mesh::Rotate(glm::vec3 _deltaRot) { rotation += _deltaRot; }
+void Mesh::Scale(glm::vec3 _deltaScale) { scale = glm::max(glm::vec3(scale.x * _deltaScale.x, scale.y * _deltaScale.y, scale.z * _deltaScale.z), MIN_SCALE); }
+
+glm::vec3 Mesh::GetPos() { return pos; }
+glm::vec3 Mesh::GetRotation() { return rotation; }
+glm::vec3 Mesh::GetScale() { return scale; }
+glm::vec3 Mesh::GetPivot() { return pivot; }
+
+void Mesh::SetPos(glm::vec3 _pos) { pos = _pos; }
+void Mesh::SetRotation(glm::vec3 _rot) { rotation = _rot; }
+void Mesh::SetScale(glm::vec3 _scale) { scale = glm::max(_scale, MIN_SCALE); }
+
+// Translate the given verts by the given vector
+void Mesh::Translate(std::set<int>& _verts, glm::vec3 _deltaPos)
 {
-    return right;
+	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
+		verts[*iter].pos += _deltaPos;
+	}
 }
 
-glm::vec3 Mesh::GetForward()
+// Rotates the given verts by the given vector
+void Mesh::Rotate(std::set<int>& _verts, glm::vec3 _deltaRot, glm::vec3 _pivot)
 {
-    return forward;
+	glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(_deltaRot.x), glm::vec3(0, 1, 0));
+	glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(_deltaRot.y), glm::vec3(1, 0, 0));
+	glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(_deltaRot.z), glm::vec3(0, 0, 1));
+	glm::mat4 rotMat = rotateZ * rotateY * rotateX;
+
+	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
+		verts[*iter].pos = RotateAround(glm::vec4(verts[*iter].pos, 1.0f), glm::vec4(_pivot, 1.0f), rotMat);
+	}
 }
 
-void Mesh::Translate(glm::vec3 _deltaPos)
+// Scales the given verts by the given vector
+void Mesh::Scale(std::set<int>& _verts, glm::vec3 _deltaScale, glm::vec3 _pivot)
 {
-    pos += _deltaPos;
+	for (auto iter = _verts.begin(); iter != _verts.end(); ++iter) {
+		glm::vec3 tempPos = verts[*iter].pos - _pivot;
+		tempPos *= _deltaScale;
+		verts[*iter].pos = tempPos + _pivot;
+	}
 }
-
-void Mesh::Rotate(glm::vec3 _deltaRot)
-{
-    rotation += _deltaRot;
-}
-
-void Mesh::Scale(glm::vec3 _deltaScale)
-{
-    scale = glm::vec3(scale.x * _deltaScale.x, scale.y * _deltaScale.y, scale.z * _deltaScale.z);
-}
-
-glm::vec3 Mesh::GetPos()
-{
-    return pos;
-}
-
-glm::vec3 Mesh::GetRotation()
-{
-    return rotation;
-}
-
-glm::vec3 Mesh::GetScale()
-{
-    return scale;
-}
-
-void Mesh::SetPos(glm::vec3 _pos)
-{
-    pos = _pos;
-}
-
-void Mesh::SetRotation(glm::vec3 _rot)
-{
-    rotation = _rot;
-}
-
-void Mesh::SetScale(glm::vec3 _scale)
-{
-    scale = glm::max(_scale, MIN_SCALE);
-}
-
 // Mesh main function definitions
 // ------------------------------
-void Mesh::AddTri(Triangle _tri)
-{
-	tris.push_back(_tri);
-}
-
-int Mesh::AddVert(Vertex _vert)
-{
-	return AddVert(lastVertIndex + 1, _vert);
-}
+void Mesh::AddFace(Face _face) { faces.push_back(_face); }
+int Mesh::AddVert(Vertex _vert) { return AddVert(lastVertIndex + 1, _vert); }
 
 int Mesh::AddVert(int _index, Vertex _vert)
 {
@@ -101,19 +91,12 @@ int Mesh::AddVert(int _index, Vertex _vert)
 	return _index;
 }
 
-void Mesh::SetTri(size_t index, Triangle _tri)
-{
-	tris[index] = _tri;
-}
+Face Mesh::GetFace(size_t index) { return faces[index]; }
+Vertex Mesh::GetVert(size_t index) { return verts[(int)index]; }
 
-Triangle Mesh::GetTri(size_t index)
+void Mesh::Clear()
 {
-	return tris[index];
-}
-
-void Mesh::ClearTris()
-{
-	tris.clear();
+	faces.clear();
 	verts.clear();
 	lastVertIndex = -1;
 }
@@ -125,18 +108,52 @@ int Mesh::GetVertCount()
 
 int Mesh::GetIndexCount()
 {
-
-	return (int)tris.size() * 3;
+	int count = 0;
+	for (int i = 0; i < faces.size(); i++) {
+		// ngon will create (n-2) triangles with 3 vertices each
+		count += (faces[i].GetNumVerts() - 2) * 3;
+	}
+	return count;
 }
 
-int Mesh::GetTriCount()
+std::vector<Face>& Mesh::GetFaces()
 {
-	return (int)tris.size();
+	return faces;
 }
 
-std::vector<Triangle>& Mesh::GetTris()
+std::vector<Triangle>& Mesh::GetTris(std::vector<Triangle>& _tris)
 {
-	return tris;
+	// Convert all stored faces into tris
+	for (int i = 0; i < faces.size(); i++) {
+		faces[i].GetTri(_tris, verts, i);
+	}
+	return _tris;
+}
+
+std::vector<std::string>& Mesh::GetMatsForVert(std::vector<std::string>& _mats, int vertId)
+{
+	for (int i = 0; i < faces.size(); i++) {
+		for (int j = 0; j < TRI_VERTS; j++) {
+			if (faces[i].vertices[j] == vertId) {
+				_mats.push_back(faces[i].mat);
+				break;
+			}
+		}
+	}
+	return _mats;
+}
+
+#include <iostream>
+void Mesh::ReorientTris(std::vector<Triangle>& _tris)
+{
+	for (int i = 0; i < _tris.size(); i++) {
+		if (glm::dot(_tris[i].normal, _tris[i].center) < 0.0f) {
+			std::cout << "Reoriented triangle [" << i << 
+				"] Normal: [" << _tris[i].normal.x << ", " << _tris[i].normal.y << ", " << _tris[i].normal.z <<
+				"], Center: [" << _tris[i].center.x << ", " << _tris[i].center.y << ", " << _tris[i].center.z << "]" << std::endl;
+			_tris[i] = Triangle(_tris[i].vertices[0], _tris[i].vertices[2], _tris[i].vertices[1], -_tris[i].normal, _tris[i].center, _tris[i].mat, _tris[i].shadingGroup);
+		}
+	}
 }
 
 std::unordered_map<int, Vertex>& Mesh::GetVerts()
@@ -150,26 +167,31 @@ void Mesh::SetName(std::string _name) { name = _name; }
 void Mesh::RecalculateNormals()
 {
 	// Reset normals for each tri
-	for (int i = 0; i < tris.size(); i++) {
-		for (int j = 0; j < TRI_VERTS; j++) {
-			verts[tris[i].vertices[j]].normal = glm::vec3(0, 0, 0);
+	for (int i = 0; i < faces.size(); i++) {
+		for (int j = 0; j < faces[i].GetNumVerts(); j++) {
+			verts[faces[i].vertices[j]].normal = glm::vec3(0, 0, 0);
 		}
 	}
 
 	// Calculate normals for each tri
-	for (int i = 0; i < tris.size(); i++) {
-		glm::vec3 triNorm = tris[i].CalcNormal();
-
-		for (int j = 0; j < TRI_VERTS; j++) {
-			verts[tris[i].vertices[j]].normal += triNorm;
+	for (int i = 0; i < faces.size(); i++) {
+		for (int j = 0; j < faces[i].GetNumVerts(); j++) {
+			glm::vec3 curVert = verts[faces[i].vertices[j]].pos;
+			glm::vec3 nextVert = verts[faces[i].vertices[(j + 1) % faces[i].GetNumVerts()]].pos;
+			verts[faces[i].vertices[j]].normal += glm::vec3(
+				(curVert.y - nextVert.y) * (curVert.z + nextVert.z),
+				(curVert.z - nextVert.z) * (curVert.x + nextVert.x),
+				(curVert.x - nextVert.x) * (curVert.y + nextVert.y));
 		}
 	}
 
 	// Normalize normals for each vertex
-	for (int i = 0; i < tris.size(); i++) {
-		for (int j = 0; j < TRI_VERTS; j++) {
-			verts[tris[i].vertices[j]].normal = glm::normalize(verts[tris[i].vertices[j]].normal);
+	for (int i = 0; i < faces.size(); i++) {
+		for (int j = 0; j < faces[i].GetNumVerts(); j++) {
+			verts[faces[i].vertices[j]].normal = glm::normalize(verts[faces[i].vertices[j]].normal);
 		}
+		// Calculate face normal
+		faces[i].CalcNormal(verts);
 	}
 }
 
@@ -182,5 +204,5 @@ Mesh::Mesh()
 
 Mesh::~Mesh()
 {
-	ClearTris();
+	Clear();
 }

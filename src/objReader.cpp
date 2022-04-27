@@ -224,7 +224,7 @@ void ReadObjFromFile(Mesh* mesh, MaterialStorage* materials, std::string locatio
     // Construct mesh
     // --------------
     // Clear previous mesh
-    mesh->ClearTris();
+    mesh->Clear();
 
     // Find the maximum size of vertices
     float maxSize = INT_MIN;
@@ -250,7 +250,7 @@ void ReadObjFromFile(Mesh* mesh, MaterialStorage* materials, std::string locatio
         mesh->RecalculateNormals();
 
     std::cout << "Successfully read object: " << fileName << "." << std::endl;
-    std::cout << "Faces: [" << faceDataList.size() << "], Tris: [" << mesh->GetTriCount() << "], Verts: [" << builtVertexList.size() << "]" << std::endl;
+    std::cout << "Faces: [" << faceDataList.size() << "], Indices: [" << mesh->GetIndexCount() << "], Verts: [" << builtVertexList.size() << "]" << std::endl;
 }
 
 // Builds an indexed triangle mesh from the provided data
@@ -270,57 +270,7 @@ void BuildMesh(Mesh* mesh, std::vector<FaceData>& tempFaces, MaterialStorage* te
             mesh->AddVert(vertex.id, vertex.ver);
         }
 
-        // If the face is not an ngon, create a triangle from it
-        if (faceVertices.size() == 3) {
-            mesh->AddTri(Triangle(faceVertices[0].id, faceVertices[1].id, faceVertices[2].id, currentMat, faceData.shadingGroup));
-        }
-        // If the face is a quad, split it into two tris
-        else if (faceVertices.size() == 4) {
-            float dist1 = glm::distance(faceVertices[0].ver.pos, faceVertices[2].ver.pos);
-            float dist2 = glm::distance(faceVertices[1].ver.pos, faceVertices[3].ver.pos);
-            if (dist1 > dist2) {
-                mesh->AddTri(Triangle(faceVertices[0].id, faceVertices[1].id, faceVertices[3].id, currentMat, faceData.shadingGroup));
-                mesh->AddTri(Triangle(faceVertices[1].id, faceVertices[2].id, faceVertices[3].id, currentMat, faceData.shadingGroup));
-            }
-            else {
-                mesh->AddTri(Triangle(faceVertices[0].id, faceVertices[1].id, faceVertices[2].id, currentMat, faceData.shadingGroup));
-                mesh->AddTri(Triangle(faceVertices[0].id, faceVertices[2].id, faceVertices[3].id, currentMat, faceData.shadingGroup));
-            }
-        }
-        // If the face is an ngon, apply polygon triangulation and then add the tris to the mesh
-        else if (faceVertices.size() > 4) {
-            // Simple triangulation model that does not take into account ngon shape or manifoldness
-            for (int i = 0; i < faceVertices.size() - 2; i++) {
-                if (i < faceVertices.size() - 3) {
-                    float dist1 = glm::distance(faceVertices[i].ver.pos, faceVertices[i + 2].ver.pos);
-                    float dist2 = glm::distance(faceVertices[i + 1].ver.pos, faceVertices[i + 3].ver.pos);
-
-                    if (dist1 > dist2) {
-                        mesh->AddTri(Triangle(faceVertices[i].id, faceVertices[i + 1].id, faceVertices[i + 3].id, currentMat, faceData.shadingGroup));
-                        mesh->AddTri(Triangle(faceVertices[i + 1].id, faceVertices[i + 2].id, faceVertices[i + 3].id, currentMat, faceData.shadingGroup));
-                    }
-                    else {
-                        mesh->AddTri(Triangle(faceVertices[i].id, faceVertices[i + 1].id, faceVertices[i + 2].id, currentMat, faceData.shadingGroup));
-                        mesh->AddTri(Triangle(faceVertices[i].id, faceVertices[i + 2].id, faceVertices[i + 3].id, currentMat, faceData.shadingGroup));
-                    }
-                    // If two tris were handled at once, skip the next one
-                    i++;
-                }
-                else {
-                    float isClockwise = (faceVertices[i + 1].ver.pos.x - faceVertices[i].ver.pos.x) * (faceVertices[i + 2].ver.pos.y - faceVertices[i].ver.pos.y)
-                        - (faceVertices[i + 2].ver.pos.x - faceVertices[i].ver.pos.x) * (faceVertices[i + 1].ver.pos.y - faceVertices[i].ver.pos.y);
-                    // Is abc a clockwise face?
-                    if (isClockwise < 0) {
-                        mesh->AddTri(Triangle(faceVertices[i].id, faceVertices[i + 1].id, faceVertices[i + 2].id, currentMat, faceData.shadingGroup));
-                    }
-                    // If abc is ccw, then acb should be clockwise
-                    else {
-                        mesh->AddTri(Triangle(faceVertices[i].id, faceVertices[i + 2].id, faceVertices[i + 1].id, currentMat, faceData.shadingGroup));
-                    }
-                }
-            }
-        }
-        // Skip lines and points as they cannot be rendered
+        mesh->AddFace(Face(faceVertices, currentMat, faceData.shadingGroup));
     }
 }
 

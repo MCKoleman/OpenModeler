@@ -53,42 +53,38 @@ void OpenGLInitBuffers(ProgramIDs* ids, int vertsSize, float* vertices, int indi
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ids->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize * sizeof(indices[0]), indices, GL_STATIC_DRAW);
 
-    // Position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+    // Selection
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Normal
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+    // Position
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)(1 * sizeof(float)));
     glEnableVertexAttribArray(1);
-    // Color
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+    // Normal
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)(4 * sizeof(float)));
     glEnableVertexAttribArray(2);
+    // Color
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, VERT_SHADER_SIZE * sizeof(float), (void*)(7 * sizeof(float)));
+    glEnableVertexAttribArray(3);
     glBindVertexArray(0);
 
     // Get uniform locations
     ids->GetUniformIDs();
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // Enable culling
-    glEnable(GL_CULL_FACE);
-
-    // Enable depth buffer
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-
 }
 
 // Draws the current scene
 // -----------------------
-void OpenGLDraw(Scene* scene, ProgramIDs* ids, int indicesSize, unsigned int* indices)
+void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, unsigned int* indices)
 {
-    glClearColor(0.90f, 0.90f, 0.90f, 1.0f);
+    glClearColor(scene->bgColor.r / 255.0f, scene->bgColor.g / 255.0f, scene->bgColor.b / 255.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Draw the object
     glUseProgram(ids->shaderProgram);
 
     // Apply MVP
+    scene->CalcInvMVP();
     glm::mat4 model = GetModelMatrix(scene);
     glm::mat4 view = GetViewMatrix(scene);
     glm::mat4 projection = GetProjectionMatrix(scene);
@@ -97,6 +93,10 @@ void OpenGLDraw(Scene* scene, ProgramIDs* ids, int indicesSize, unsigned int* in
     glUniformMatrix4fv(ids->matrixID, 1, GL_FALSE, &mvp[0][0]);
     glUniformMatrix4fv(ids->modelID, 1, GL_FALSE, &model[0][0]);
     glUniformMatrix3fv(ids->normalModelID, 1, GL_FALSE, &normalModel[0][0]);
+
+    // Send window scale
+    glm::vec2 winScale = glm::vec2(SCR_WIDTH, SCR_HEIGHT);
+    glUniform2fv(ids->winScaleID, 1, &winScale[0]);
 
     // Apply lighting
     glUniform1f(ids->ambientStrengthID, scene->GetLight()->ka);
@@ -121,6 +121,27 @@ void OpenGLCleanup(ProgramIDs* ids)
     glDeleteProgram(ids->shaderProgram);
 }
 
+// Enable or disable wireframe
+// ------------------------------------------
+void OpenGLEnableWireframe(bool enable)
+{
+    if (enable) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // Disable culling
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+    }
+    else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        // Enable culling
+        glEnable(GL_CULL_FACE);
+
+        // Enable depth buffer
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+    }
+}
+
 // Calculates the model view perspective matrix
 // --------------------------------------------
 glm::mat4 CalcMVP(Scene* scene)
@@ -131,7 +152,7 @@ glm::mat4 CalcMVP(Scene* scene)
 // Returns the projection matrix of the given camera
 glm::mat4 GetProjectionMatrix(Scene* scene)
 {
-    Mesh* mesh = scene->GetCurMesh();
+    Mesh* mesh = scene->GetMeshes()->GetAll().begin()->second;
     Camera* camera = scene->GetCamera();
 
     // Projection
@@ -162,7 +183,7 @@ glm::mat4 GetViewMatrix(Scene* scene)
 // Returns the model matrix of the given mesh
 glm::mat4 GetModelMatrix(Scene* scene)
 {
-    Mesh* mesh = scene->GetCurMesh();
+    Mesh* mesh = scene->GetMeshes()->GetAll().begin()->second;
 
     // Model position
     glm::vec3 scale = mesh->GetScale();
@@ -177,6 +198,22 @@ glm::mat4 GetModelMatrix(Scene* scene)
     glm::mat4 modelRotated = rotateZ * rotateY * rotateX * translate;
     glm::mat4 modelUnscaled = glm::translate(modelRotated, position);
     return glm::scale(modelUnscaled, scale);
+}
+
+// Taken from https://gamedev.stackexchange.com/questions/115032/how-should-i-rotate-vertices-around-the-origin-on-the-cpu
+glm::vec4 RotateAround(glm::vec4 aPointToRotate, glm::vec4 aRotationCenter, glm::mat4x4 aRotationMatrix)
+{
+    glm::mat4x4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(aRotationCenter.x, aRotationCenter.y, aRotationCenter.z));
+    glm::mat4x4 invTranslate = glm::inverse(translate);
+
+    // The idea:
+    // 1) Translate the object to the center
+    // 2) Make the rotation
+    // 3) Translate the object back to its original location
+
+    glm::mat4x4 transform = translate * aRotationMatrix * invTranslate;
+
+    return transform * aPointToRotate;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
