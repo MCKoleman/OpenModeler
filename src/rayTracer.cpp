@@ -14,11 +14,11 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 	glm::vec3 uVect = glm::normalize(glm::cross(wVect, upVect));
 	glm::vec3 vVect = glm::normalize(glm::cross(wVect, uVect));
 
-	glm::vec3 origin = scene->GetInvMVP() * glm::vec4(1);
-	glm::vec3 direction = -glm::normalize(glm::vec3(scene->GetInvMVP() * glm::vec4(u, v, -1, 1)));
-	
+	glm::vec3 origin = camera->pos;
+	//glm::vec3 origin = scene->GetInvMVP() * glm::vec4(1);
+	glm::vec3 direction = -(glm::vec3(scene->GetInvMVP() * glm::vec4(u, v, -1, 1)));
+	//direction = glm::normalize(origin - direction);
 	if (print) {
-		std::setprecision(4);
 		std::cout << "InvMVP0: [" << scene->GetInvMVP()[0].r << ", " << scene->GetInvMVP()[1].r << ", " << scene->GetInvMVP()[2].r << ", " << scene->GetInvMVP()[3].r << "]\n";
 		std::cout << "InvMVP1: [" << scene->GetInvMVP()[0].g << ", " << scene->GetInvMVP()[1].g << ", " << scene->GetInvMVP()[2].g << ", " << scene->GetInvMVP()[3].g << "]\n";
 		std::cout << "InvMVP2: [" << scene->GetInvMVP()[0].b << ", " << scene->GetInvMVP()[1].b << ", " << scene->GetInvMVP()[2].b << ", " << scene->GetInvMVP()[3].b << "]\n";
@@ -30,7 +30,7 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 			<< camera->dir.x << ", " << camera->dir.y << ", " << camera->dir.z << "]\n";
 	}
 
-	return Ray(origin, glm::normalize(direction));
+	return Ray(origin, direction);
 }
 
 //Returns bisector of given vectors
@@ -82,8 +82,13 @@ void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 	{
 		for (int j = 0; j < SCR_WIDTH; j++)
 		{
-			float u = (j + 0.5f) / SCR_WIDTH;
-			float v = (i + 0.5f) / SCR_HEIGHT;
+			float left = -1.0f;
+			float right = 1.0f;
+			float top = 1.0f;
+			float bottom = -1.0f;
+
+			float u = left + (right - left) * (j + 0.5f) / (float)SCR_WIDTH;
+			float v = bottom + (top - bottom) * (i + 0.5f) / (float)SCR_HEIGHT;
 
 			Ray viewRay = generateRay(scene, u, v, (i == j && (i == SCR_HEIGHT || i == 0)));
 			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 255.0f);

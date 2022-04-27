@@ -202,8 +202,10 @@ Selection::Selection()
 // Returns the nearest mesh to the clicked position
 Mesh* Selection::GetNearestMesh(Scene* scene, int i, int j)
 {
+	//std::cout << "Clicked [" << i << ", " << j << "]\n";
 	float u = (j + 0.5f) / SCR_WIDTH;
 	float v = (i + 0.5f) / SCR_HEIGHT;
+	//std::cout << "Transformed click [" << u << ", " << v << "]\n";
 	Ray ray = RayTracer::generateRay(scene, u, v, true);
 	if (ray.DoesIntersect(scene->GetRenderTris()))
 		return scene->GetMeshes()->GetAll().begin()->second;

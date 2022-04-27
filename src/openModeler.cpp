@@ -100,7 +100,7 @@ int main()
                 std::cout << "Checking if " << viter->first << " is selected: " << (selVerts.find(viter->first) != selVerts.end() ? "true" : "false") << "\n";
             }
             */
-            std::cout << "Selecting [" << sel.newSelVerts.size() << "] new verts, removing [" << sel.removedSelVerts.size() << "]\n";
+            //std::cout << "Selecting [" << sel.newSelVerts.size() << "] new verts, removing [" << sel.removedSelVerts.size() << "]\n";
 
             for (auto iter = sel.newSelVerts.begin(); iter != sel.newSelVerts.end(); ++iter) {
                 vertices[*iter * VERT_SHADER_SIZE] = 1.0f;
@@ -115,7 +115,7 @@ int main()
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertsSize * sizeof(vertices[0]), vertices);
             locks.reselect = false;
 
-            PrintArray("Testing vertex data", vertices, vertsSize, 10);
+            //PrintArray("Testing vertex data", vertices, vertsSize, 10);
         }
 
         // Update VAO on rerender call
