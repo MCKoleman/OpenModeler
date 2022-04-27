@@ -22,7 +22,7 @@ private:
 public:
 	glm::vec3 bgColor = glm::vec3(230, 230, 230);
 	glm::mat4 GetInvMVP();
-	void CalcMVP();
+	void CalcInvMVP();
 
 	void GetVAO(float* vertices, int vertsSize, unsigned int* indices, int indicesSize, Selection* _sel = nullptr);
 	void CalcRenderTris();

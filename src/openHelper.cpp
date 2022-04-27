@@ -84,6 +84,7 @@ void OpenGLDraw(Scene* scene, Selection* sel, ProgramIDs* ids, int indicesSize, 
     glUseProgram(ids->shaderProgram);
 
     // Apply MVP
+    scene->CalcInvMVP();
     glm::mat4 model = GetModelMatrix(scene);
     glm::mat4 view = GetViewMatrix(scene);
     glm::mat4 projection = GetProjectionMatrix(scene);

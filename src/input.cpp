@@ -269,9 +269,6 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
         // Handle selection/deselection
         else if (LEFT_MOUSE_PRESS && !locks->lockLeftMouse) {
             locks->lockLeftMouse = true;
-            // If shift is not pressed, replace selections instead of adding
-            if(!SHIFT_PRESS)
-                sel->ClearSelection();
 
             // Handle selection
             Mesh* tempMesh;
@@ -293,7 +290,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
                 if (sel->IsFaceSelected(tempFace))
                     sel->DeselectFace(tempFace);
                 else
-                    sel->SelectFace(tempFace);
+                    sel->SelectFace(tempFace, !SHIFT_PRESS);
                 locks->reselect = true;
                 break;
             case SelMode::VERT:
@@ -304,7 +301,7 @@ bool ProcessInput(GLFWwindow* window, Scene* scene, Selection* sel, InputLocks* 
                 if (sel->IsVertSelected(tempVert))
                     sel->DeselectVert(tempVert);
                 else
-                    sel->SelectVert(tempVert);
+                    sel->SelectVert(tempVert, !SHIFT_PRESS);
                 locks->reselect = true;
                 break;
             }

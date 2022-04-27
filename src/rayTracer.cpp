@@ -15,13 +15,14 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 	glm::vec3 vVect = glm::normalize(glm::cross(wVect, uVect));
 
 	glm::vec3 origin = scene->GetInvMVP() * glm::vec4(1);
-	glm::vec3 direction = glm::normalize(glm::vec3(scene->GetInvMVP() * glm::vec4(u, v, -1, 1)));
+	glm::vec3 direction = -glm::normalize(glm::vec3(scene->GetInvMVP() * glm::vec4(u, v, -1, 1)));
 	
 	if (print) {
-		std::cout << "InvMVP0: [" << scene->GetInvMVP()[0].x << "," << scene->GetInvMVP()[1].x << "," << scene->GetInvMVP()[2].x << "," << scene->GetInvMVP()[2].x << "]\n";
-		std::cout << "InvMVP1: [" << scene->GetInvMVP()[0].y << "," << scene->GetInvMVP()[1].y << "," << scene->GetInvMVP()[2].y << "," << scene->GetInvMVP()[2].y << "]\n";
-		std::cout << "InvMVP2: [" << scene->GetInvMVP()[0].z << "," << scene->GetInvMVP()[1].z << "," << scene->GetInvMVP()[2].z << "," << scene->GetInvMVP()[2].z << "]\n";
-		std::cout << "InvMVP3 : [" << scene->GetInvMVP()[0].w << "," << scene->GetInvMVP()[1].w << "," << scene->GetInvMVP()[2].w << "," << scene->GetInvMVP()[2].w << "]\n";
+		std::setprecision(4);
+		std::cout << "InvMVP0: [" << scene->GetInvMVP()[0].r << ", " << scene->GetInvMVP()[1].r << ", " << scene->GetInvMVP()[2].r << ", " << scene->GetInvMVP()[3].r << "]\n";
+		std::cout << "InvMVP1: [" << scene->GetInvMVP()[0].g << ", " << scene->GetInvMVP()[1].g << ", " << scene->GetInvMVP()[2].g << ", " << scene->GetInvMVP()[3].g << "]\n";
+		std::cout << "InvMVP2: [" << scene->GetInvMVP()[0].b << ", " << scene->GetInvMVP()[1].b << ", " << scene->GetInvMVP()[2].b << ", " << scene->GetInvMVP()[3].b << "]\n";
+		std::cout << "InvMVP3: [" << scene->GetInvMVP()[0].a << ", " << scene->GetInvMVP()[1].a << ", " << scene->GetInvMVP()[2].a << ", " << scene->GetInvMVP()[3].a << "]\n";
 
 		std::cout << "Generating ray from [" << origin.x << ", " << origin.y << ", " << origin.z << "] in direction [" 
 			<< direction.x << ", " << direction.y << ", " << direction.z << "]\n";
@@ -73,7 +74,9 @@ glm::vec3 RayTracer::normal(std::vector<glm::vec3>& vPos)
 void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 {
 	std::cout << "Started rendering scene\n";
-	scene->CalcMVP();
+	scene->CalcInvMVP();
+	glm::vec3 highestDir = glm::vec3(-10000);
+	glm::vec3 lowestDir = glm::vec3(10000);
 
 	for (int i = 0; i < SCR_HEIGHT; i++)
 	{
@@ -84,7 +87,14 @@ void RayTracer::RayTrace(Scene* scene, std::vector<glm::vec4>& result)
 
 			Ray viewRay = generateRay(scene, u, v, (i == j && (i == SCR_HEIGHT || i == 0)));
 			result[i * SCR_WIDTH + j] = glm::vec4(getPixelColor(scene, viewRay, 0), 255.0f);
+
+			lowestDir = glm::min(lowestDir, viewRay.direction);
+			highestDir = glm::max(highestDir, viewRay.direction);
 		}
 	}
+	glm::vec3 dirDiff = highestDir - lowestDir;
+	std::cout << "Difference between directions: [" << dirDiff.x << ", " << dirDiff.y << ", " << dirDiff.z << "]\n";
+	std::cout << "Highest direction: [" << highestDir.x << ", " << highestDir.y << ", " << highestDir.z << "]\n";
+	std::cout << "Lowest direction: [" << lowestDir.x << ", " << lowestDir.y << ", " << lowestDir.z << "]\n";
 	std::cout << "Finished rendering scene\n";
 }

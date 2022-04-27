@@ -26,9 +26,9 @@ public:
 	void GetSelectedVerts(std::set<int>& _verts);
 
 	// Selects the face with the given ID
-	void SelectFace(int _id);
+	void SelectFace(int _id, bool _deselect = false);
 	// Selects the vertex with the given ID
-	void SelectVert(int _id);
+	void SelectVert(int _id, bool _deselect = false);
 	// Selects the given mesh
 	void SelectMesh(Mesh* mesh);
 	// Deselects the face with the given ID

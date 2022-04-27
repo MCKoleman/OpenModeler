@@ -46,7 +46,7 @@ int main()
     unsigned int* indices = new unsigned int[indicesSize];
     scene->CalcRenderTris();
     scene->GetVAO(vertices, vertsSize, indices, indicesSize);
-    scene->CalcMVP();
+    scene->CalcInvMVP();
 
     // Print vertices and indices
     if (options.print == 1) {

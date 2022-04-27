@@ -40,20 +40,24 @@ void Selection::GetSelectedVerts(std::set<int>& _verts)
 }
 
 // Selects the face with the given ID
-void Selection::SelectFace(int _id) 
+void Selection::SelectFace(int _id, bool _deselect) 
 {
 	if (_id < 0)
 		return;
+	if (_deselect)
+		selFaces.clear();
 
 	selFaces.emplace(_id); 
 	std::cout << "Selected face [" << _id << "].\n"; 
 }
 
 // Selects the vertex with the given ID
-void Selection::SelectVert(int _id) 
+void Selection::SelectVert(int _id, bool _deselect) 
 { 
 	if (_id < 0)
 		return;
+	if (_deselect)
+		selVerts.clear();
 
 	selVerts.emplace(_id); 
 	std::cout << "Selected vertex [" << _id << "].\n"; 
