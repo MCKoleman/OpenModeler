@@ -16,10 +16,15 @@ Ray RayTracer::generateRay(Scene* scene, float u, float v, bool print)
 	glm::vec3 uVect = glm::normalize(glm::cross(wVect, upVect));
 	glm::vec3 vVect = glm::normalize(glm::cross(wVect, uVect));
 
-	glm::vec3 origin = eyePos;
-	glm::vec3 direction = - 1.0f * wVect + u * uVect + v * vVect;
+	glm::vec3 origin = scene->GetInvMVP() * glm::vec4(1);
+	glm::vec3 direction = glm::normalize(glm::vec3(scene->GetInvMVP() * glm::vec4(u, v, -1, 1)));
 	
 	if (print) {
+		std::cout << "InvMVP0: [" << scene->GetInvMVP()[0].x << "," << scene->GetInvMVP()[1].x << "," << scene->GetInvMVP()[2].x << "," << scene->GetInvMVP()[2].x << "]\n";
+		std::cout << "InvMVP1: [" << scene->GetInvMVP()[0].y << "," << scene->GetInvMVP()[1].y << "," << scene->GetInvMVP()[2].y << "," << scene->GetInvMVP()[2].y << "]\n";
+		std::cout << "InvMVP2: [" << scene->GetInvMVP()[0].z << "," << scene->GetInvMVP()[1].z << "," << scene->GetInvMVP()[2].z << "," << scene->GetInvMVP()[2].z << "]\n";
+		std::cout << "InvMVP3 : [" << scene->GetInvMVP()[0].w << "," << scene->GetInvMVP()[1].w << "," << scene->GetInvMVP()[2].w << "," << scene->GetInvMVP()[2].w << "]\n";
+
 		std::cout << "Generating ray from [" << origin.x << ", " << origin.y << ", " << origin.z << "] in direction [" 
 			<< direction.x << ", " << direction.y << ", " << direction.z << "]\n";
 		std::cout << "Camera info: Pos [" << camera->pos.x << ", " << camera->pos.y << ", " << camera->pos.z << "], Direction ["

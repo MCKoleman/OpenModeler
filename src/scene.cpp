@@ -73,7 +73,7 @@ glm::mat4 Scene::GetInvMVP()
 
 void Scene::CalcMVP()
 {
-	invMVP = glm::inverse(GetProjectionMatrix(this)) * glm::inverse(GetViewMatrix(this)) * glm::inverse(GetModelMatrix(this));
+	invMVP = glm::inverse(GetProjectionMatrix(this) * GetViewMatrix(this) * GetModelMatrix(this));
 }
 
 void Scene::CalcRenderTris()
